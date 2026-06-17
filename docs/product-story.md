@@ -8,6 +8,8 @@ Property operations teams often manage cost control, supplier pricing, contract 
 
 The public version is designed for GitHub display. It communicates the product idea without exposing production source history, business data, uploads, contracts, account details, infrastructure, secrets or internal domains.
 
+The default interface language is Chinese to better reflect the operational context. English is kept as a switchable portfolio-facing layer.
+
 ## Narrative Flow
 
 1. The portal gives executives and operators a single entry point.

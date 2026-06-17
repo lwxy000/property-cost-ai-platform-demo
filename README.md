@@ -6,9 +6,12 @@ This repository is designed for GitHub display only. It is not a fork of any pro
 
 The demo can be hosted as static files, but the browser experience is interactive: filters, searches, review drawers, mock workflow actions, AI import steps, heat-map drilldowns, Q&A matching and permission previews all run in local front-end state.
 
+The interface supports Chinese and English. Chinese is the default language because the operating scenarios are closer to Chinese property/procurement workflows, while English remains available for GitHub portfolio display.
+
 ## What It Shows
 
 - Portal home for module routing
+- Chinese / English language switch with local browser state
 - Portfolio command center with synthetic region, project and risk signals
 - Cost overview with 12-month budget, actual, paid and variance mock data
 - Material price library with reviewer-confirmed rows and AI import candidates

@@ -5,6 +5,7 @@ This demo presents product capability, not production implementation.
 ## Included
 
 - Static-hosted interactive UI shell
+- Chinese and English front-end language switch
 - Mock data stored in JavaScript files
 - Fictional operating scenarios
 - Local browser-state workflows for filtering, review, confirmation and Q&A matching

@@ -884,6 +884,34 @@ tr:last-child td {
   color: #fff;
 }
 
+.language-toggle {
+  display: inline-flex;
+  overflow: hidden;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.language-toggle button {
+  min-width: 48px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  padding: 0 10px;
+  font-weight: 800;
+}
+
+.language-toggle button:last-child {
+  border-right: 0;
+}
+
+.language-toggle button.is-active {
+  background: var(--teal);
+  color: #fff;
+}
+
 .progress {
   display: block;
   width: 130px;

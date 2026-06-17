@@ -26,6 +26,7 @@ const app = document.querySelector("#app");
 
 const state = {
   active: "portal",
+  language: localStorage.getItem("demo-language") || "zh",
   region: "All Regions",
   project: "All Projects",
   materialQuery: "",
@@ -43,6 +44,449 @@ const state = {
   qaResultIndex: 2,
   selectedRole: "HQ Cost Reviewer",
 };
+
+const zh = {
+  Portal: "门户首页",
+  "Cost Overview": "成本总览",
+  "Material Library": "材料库",
+  "Cost Map": "成本地图",
+  Contracts: "合同管理",
+  "Smart Q&A": "智能问答",
+  Accounts: "账号权限",
+  "Unified entry and module routing": "统一入口与模块导航",
+  "Budget, actuals, variance and actions": "预算、实际、偏差与动作闭环",
+  "Price library and AI import review": "价格库与 AI 导入复核",
+  "Regional standards and benchmark pricing": "区域标准与成本基准",
+  "Payment progress and risk exposure": "付款进度与风险敞口",
+  "Local matching, OCR mock and AI answer flow": "本地匹配、识别模拟与 AI 问答流程",
+  "Roles, access and approval boundaries": "角色、访问与审批边界",
+  Region: "区域",
+  Project: "项目",
+  "Mock Data": "演示数据",
+  "Demo Boundary": "演示边界",
+  "Front-end mock only": "仅前端模拟",
+  "No database": "不连接数据库",
+  "No secrets": "无密钥",
+  "Open Demo": "开源演示版",
+  "Managed Projects": "在管项目",
+  "Annual Cost Scope": "年度成本口径",
+  "Material Prices": "材料价格",
+  "Contract Exposure": "合同敞口",
+  "AI Review Tasks": "AI 复核任务",
+  "Permission Events": "权限事件",
+  "12 demo regions": "12 个演示区域",
+  "Synthetic portfolio": "模拟组合口径",
+  "Mock library rows": "模拟价格库行",
+  "312 demo contracts": "312 份演示合同",
+  "Static simulations": "浏览器模拟任务",
+  "Role audit mock": "角色审计模拟",
+  "Cost variance under review": "成本偏差待复核",
+  "Contract payment lag": "合同付款滞后",
+  "Material price opportunities": "材料价格机会",
+  "Permission anomalies blocked": "权限异常拦截",
+  "Across 41 projects": "覆盖 41 个项目",
+  "26 demo items": "26 个演示事项",
+  "143 benchmark gaps": "143 个基准差异",
+  "No privileged bypass": "无越权绕过",
+  "Operations Portal": "运营门户",
+  "Local Preview": "本地预览",
+  "Module Health": "模块健康度",
+  "Portfolio-scale public demo snapshot": "集团级公开演示快照",
+  Module: "模块",
+  Coverage: "覆盖范围",
+  Signal: "信号",
+  Health: "状态",
+  Watch: "关注",
+  Good: "正常",
+  "Sanitization Rules": "脱敏规则",
+  "Public-safe demo guardrails": "公开版安全边界",
+  "Operations Feed": "运营动态",
+  "Fictional control-center activity": "虚构的总控台动作",
+  "Design Direction": "设计方向",
+  "IMAGE-2 visual advisor output": "IMAGE-2 视觉顾问输出",
+  "Annual Budget": "年度预算",
+  "Actual Cost": "实际成本",
+  Forecast: "预测金额",
+  "Open Actions": "待办动作",
+  "AI Matched Issues": "AI 匹配事项",
+  "Savings Pipeline": "节降机会池",
+  "86 projects": "86 个项目",
+  "47.6% used": "已使用 47.6%",
+  "+3.7% vs budget": "较预算 +3.7%",
+  "42 high priority": "42 个高优先级",
+  "mock knowledge hits": "模拟知识命中",
+  "review in progress": "复核中",
+  "Monthly Cost Execution": "月度成本执行",
+  "Budget, actual and paid values are fictional": "预算、实际与已付均为虚构数据",
+  "Action Queue": "动作队列",
+  "Variance review workflow": "偏差复核流程",
+  "Review high variance subjects": "复核高偏差科目",
+  "Compare monthly service cost map": "对比月度服务成本地图",
+  "Export synthetic executive snapshot": "导出演示经营快照",
+  "Cost Subjects": "成本科目",
+  "Scoped by": "当前范围",
+  Area: "区域",
+  Subject: "科目",
+  Budget: "预算",
+  Actual: "实际",
+  Variance: "偏差",
+  Owner: "负责人",
+  "Material Price Library": "材料价格库",
+  "Reviewer-confirmed synthetic prices": "经复核的模拟价格",
+  "Search material or supplier": "搜索材料或供应商",
+  Material: "材料",
+  Category: "品类",
+  Unit: "单位",
+  City: "区域",
+  Supplier: "供应商",
+  Current: "当前价",
+  Tax: "税率",
+  Change: "变动",
+  Status: "状态",
+  Confirmed: "已确认",
+  Review: "待复核",
+  "AI Import Mock": "AI 导入模拟",
+  "Candidate generation, edit and confirm": "候选生成、编辑与确认",
+  Upload: "上传",
+  Recognize: "识别",
+  Confirm: "确认",
+  "Current mock step": "当前模拟步骤",
+  "Completed in browser state": "浏览器状态已完成",
+  Pending: "待处理",
+  Reset: "重置",
+  "Run Again": "重新演示",
+  "Advance Step": "推进步骤",
+  "Selected Candidate": "当前候选",
+  "Recognition Candidates": "识别候选",
+  "No external model is called in this browser-only demo": "浏览器演示不调用外部模型",
+  "Source File": "来源文件",
+  "Extracted Item": "识别条目",
+  Confidence: "置信度",
+  "Reviewer Action": "复核动作",
+  State: "状态",
+  "Regional Cost Command Center": "区域成本指挥中心",
+  "12-region synthetic benchmark model with prioritized action value": "12 区域模拟基准模型与动作价值排序",
+  "$4.30M demo savings pool": "$4.30M 演示节降池",
+  "Cost Pressure Heat Matrix": "成本压力热力矩阵",
+  "Fictional score by region and major operating category": "按区域与主类展示虚构压力分",
+  "Selected Signal": "选中信号",
+  "Pressure score": "压力分",
+  priority: "优先级",
+  critical: "严重",
+  high: "高",
+  watch: "关注",
+  good: "正常",
+  "Suggested Action": "建议动作",
+  "estimated impact, owner": "预计影响，负责人",
+  "Standard Item Benchmarks": "标准项基准",
+  "Current effective price only, no historical source files": "仅展示当前有效价，不含历史源文件",
+  "Cost Item": "成本项",
+  "Demo Standard": "演示标准",
+  "Current Price": "当前价格",
+  Progress: "进度",
+  Normal: "正常",
+  "Prioritized Action Pool": "优先动作池",
+  "Demo recommendations for procurement, contract and engineering follow-up": "用于采购、合同与工程跟进的演示建议",
+  Action: "动作",
+  "Estimated Impact": "预计影响",
+  Scope: "范围",
+  "Ledger Contracts": "台账合同",
+  "Contract Amount": "合同金额",
+  "Pending Payment": "待付款",
+  "Due Soon": "即将到期",
+  "High Risk": "高风险",
+  "AI Flags": "AI 标记",
+  "Mock batch 2026-Q2": "2026-Q2 模拟批次",
+  "Fictional ledger": "虚构台账",
+  "26 items": "26 个事项",
+  "Next 45 days": "未来 45 天",
+  "Needs review": "需要复核",
+  "Rule-based mock": "规则模拟",
+  "Payment Progress Exposure": "付款进度敞口",
+  "mock contracts in current view": "份合同在当前视图",
+  "Risk filter": "风险筛选",
+  All: "全部",
+  High: "高",
+  Medium: "中",
+  Low: "低",
+  "Search contract, vendor or reason": "搜索合同、供应商或原因",
+  Contract: "合同",
+  Vendor: "供应商",
+  Amount: "金额",
+  Paid: "已付",
+  Risk: "风险",
+  Reason: "原因",
+  "Contract Detail": "合同详情",
+  "Click a row to update this mock drawer": "点击行更新此模拟抽屉",
+  "Paid Progress": "付款进度",
+  Signed: "已签署",
+  "Mock contract ledger created": "已创建模拟合同台账",
+  "Service Period": "服务周期",
+  "Monthly service tracking active": "月度服务跟踪中",
+  "Payment Review": "付款复核",
+  Closeout: "结算归档",
+  "Pending final synthetic evidence": "等待最终模拟凭证",
+  "Create Task": "创建任务",
+  "Request Evidence": "索要资料",
+  "Simulate Approval": "模拟审批",
+  "Latest Mock Action": "最近模拟动作",
+  "Risk Logic": "风险逻辑",
+  "First-stage public demo rules": "公开版首阶段规则",
+  "Monthly service contracts track paid-through month.": "月度服务合同跟踪已付至月份。",
+  "Other contracts track cumulative payment ratio.": "其他合同跟踪累计付款比例。",
+  "Risk labels are generated from fake amounts and dates.": "风险标签由虚构金额与日期生成。",
+  "Audit Boundary": "审计边界",
+  "What this demo does not include": "本演示不包含的内容",
+  "No real contract files.": "不包含真实合同文件。",
+  "No real payment ledger.": "不包含真实付款台账。",
+  "No production attachment workflow.": "不包含生产附件流程。",
+  "Smart Q&A Workbench": "智能问答工作台",
+  "Local match first; vision and deep answer are explicit actions": "优先本地匹配，识别与深度回答为显式动作",
+  "Local match": "本地匹配",
+  "Vision extract": "识别提取",
+  "Deep answer": "深度回答",
+  "Get Answer": "获取回答",
+  "Knowledge Cases": "知识案例",
+  "Fictional examples only": "仅虚构示例",
+  "Use Case": "使用案例",
+  "AI Audit Trail": "AI 审计轨迹",
+  "Shows cost-control behavior without real model calls": "展示成本管控行为，但不调用真实模型",
+  Note: "说明",
+  "Role Matrix": "角色矩阵",
+  "Select a role to preview masked access": "选择角色预览脱敏访问",
+  "Permission Preview": "权限预览",
+  "Current selected demo role": "当前选中演示角色",
+  Cost: "成本",
+  Materials: "材料",
+  "Smart Q&A": "智能问答",
+  "Visible in demo role": "当前角色可见",
+  "Masked by selected role": "按当前角色脱敏",
+  "Approval Flow": "审批流程",
+  "Mock account governance": "模拟账号治理",
+  Request: "申请",
+  "Operator submits scoped access": "运营人员提交范围化权限申请",
+  "HQ reviewer validates role and project scope": "总部复核角色与项目范围",
+  Activate: "启用",
+  "Admin grants demo access": "管理员授予演示权限",
+  "No production repository history": "不包含生产仓库历史",
+  "No real database connection": "不连接真实数据库",
+  "No real uploads or contract files": "不包含真实上传或合同文件",
+  "No secrets, domains, IP addresses or accounts": "不包含密钥、域名、IP 或账号",
+  "All records are fictional mock data": "所有记录均为虚构演示数据",
+  "18,420 prices": "18,420 条价格",
+  "42 high-priority actions": "42 个高优先级动作",
+  "143 benchmark opportunities": "143 个基准机会",
+  "12 regions": "12 个区域",
+  "31 standards above band": "31 个标准项高于区间",
+  "26 payment lag cases": "26 个付款滞后案例",
+  "3,842 matches": "3,842 次匹配",
+  "1,284 AI tasks simulated": "1,284 个 AI 模拟任务",
+  "4 roles": "4 个角色",
+  "37 blocked demo events": "37 个演示拦截事件",
+  "AI import recognized 42 candidate material rows": "AI 导入识别出 42 条材料候选记录",
+  "Cost map found 9 security benchmarks above demo band": "成本地图发现 9 个安保基准高于演示区间",
+  "Contract risk queue grouped 6 high-risk payment lags": "合同风险队列归集 6 个高风险付款滞后项",
+  "Smart Q&A matched policy case CT-02 for payment review": "智能问答命中付款复核规则 CT-02",
+  "Permission center blocked external full-library access": "权限中心拦截外部角色访问全量库",
+  "Cost Ops": "成本运营",
+  "Material Desk": "材料台",
+  "Contract Desk": "合同台",
+  "AI Assistant": "AI 助手",
+  "Access Control": "权限控制",
+  "Site Ops": "现场运营",
+  Engineering: "工程",
+  "Energy Desk": "能源台",
+  "Asset Desk": "资产台",
+  Procurement: "采购",
+  "Commercial Ops": "商业运营",
+  "Security Service": "安保服务",
+  "Cleaning Service": "保洁服务",
+  Maintenance: "维保",
+  Utilities: "能耗",
+  "Elevator Maintenance": "电梯维保",
+  Landscape: "绿化",
+  "Public Area Repair": "公区维修",
+  Consumables: "耗材",
+  "Fire System Testing": "消防系统检测",
+  "Parking Operation": "停车运营",
+  "Energy Inspection": "能源巡检",
+  "Pest Control": "消杀服务",
+  Construction: "工程材料",
+  Electrical: "电气",
+  Operations: "运营物料",
+  Repair: "维修",
+  Security: "安保",
+  Cleaning: "保洁",
+  Elevator: "电梯",
+  Benchmark: "基准",
+  "Demo Concrete C30": "演示混凝土 C30",
+  "Demo LED Panel": "演示 LED 面板",
+  "Demo Cleaning Agent": "演示清洁剂",
+  "Demo Elevator Part": "演示电梯配件",
+  "Demo Planting Soil": "演示种植土",
+  "Demo Fire Pump Seal": "演示消防泵密封件",
+  "Demo Access Card": "演示门禁卡",
+  "Demo Waterproof Coating": "演示防水涂料",
+  "Demo Gate Motor": "演示道闸电机",
+  "Demo Meter Cabinet": "演示表箱",
+  "Demo Patrol Device": "演示巡更设备",
+  "Demo Filter Cartridge": "演示滤芯",
+  "Demo Pipe DN50": "演示管材 DN50",
+  "Demo Sensor Kit": "演示传感器套件",
+  "Demo Valve Assembly": "演示阀门组件",
+  "Needs unit check": "需核对单位",
+  "Ready to confirm": "可确认",
+  "Supplier review": "供应商复核",
+  "Tax rate check": "税率核对",
+  "Category review": "品类复核",
+  "Security staffing": "安保排班",
+  "Cleaning frequency": "保洁频次",
+  "Lift count": "电梯数量",
+  "Energy savings": "节能收益",
+  "Shared vendor pool": "共享供应商池",
+  "Compact layout": "紧凑业态",
+  "Aging assets": "老旧资产",
+  "Emergency repair": "应急维修",
+  "Seasonal landscaping": "季节性绿化",
+  "Lift maintenance": "电梯维保",
+  "Fire system": "消防系统",
+  "Weekend staffing": "周末排班",
+  "Vendor pooling": "供应商集采",
+  "Energy controls": "能耗控制",
+  "Low repair rate": "低维修率",
+  "Waterproof repair": "防水维修",
+  "Aging pumps": "老旧水泵",
+  "Small contract base": "小合同基数",
+  "Parking operation": "停车运营",
+  "Gate systems": "道闸系统",
+  "Night patrol": "夜间巡逻",
+  "Fire testing": "消防检测",
+  "High-rise assets": "高层资产",
+  "Repair backlog": "维修积压",
+  "Security Post": "安保岗位",
+  "Cleaning Labor": "保洁人工",
+  "Green Care": "绿化养护",
+  "Elevator Maint.": "电梯维保",
+  "Fire Pump Maint.": "消防泵维保",
+  "Public Repair": "公区维修",
+  "Energy Inspection": "能源巡检",
+  "Normalize security staffing model": "统一安保排班模型",
+  "Retender cleaning consumables bundle": "重采保洁耗材包",
+  "Review elevator maintenance unit price": "复核电梯维保单价",
+  "Merge small repair contracts by region": "按区域合并小额维修合同",
+  "Lock fire-system testing package price": "锁定消防检测打包价格",
+  "Benchmark waterproof repair unit rates": "对标防水维修单价",
+  "18 projects": "18 个项目",
+  "9 suppliers": "9 家供应商",
+  "42 lifts": "42 台电梯",
+  "31 contracts": "31 份合同",
+  "27 projects": "27 个项目",
+  "Fire System": "消防系统",
+  Energy: "能源",
+  "Security Device": "安防设备",
+  "Payment lag": "付款滞后",
+  "Due date approaching": "即将到期",
+  "Missing service period": "缺少服务期间",
+  "On track": "正常推进",
+  "Acceptance evidence pending": "验收资料待补",
+  "Unit price above benchmark": "单价高于基准",
+  "Within payment plan": "符合付款计划",
+  "Warranty clause review": "质保条款复核",
+  "Supplier onboarding": "供应商准入",
+  "Contract review": "合同复核",
+  "Material import": "材料导入",
+  "Cost map": "成本地图",
+  "Permission center": "权限中心",
+  "Can a vendor be approved without complete tax information?": "供应商税务信息不完整时能否通过准入？",
+  "What should be checked before approving a monthly service payment?": "审批月度服务付款前应检查什么？",
+  "Can AI recognition write directly into the price library?": "AI 识别结果能否直接写入价格库？",
+  "Which regions should be reviewed first for repair cost variance?": "哪些区域应优先复核维修成本偏差？",
+  "Can an external vendor see cross-region contract exposure?": "外部供应商能否查看跨区域合同敞口？",
+  "Can this demo approve an AI-extracted material price automatically?": "这个演示能否自动审批 AI 识别出的材料价格？",
+  "No. The demo rule requires tax identity, contact details, and category scope before approval.": "不能。演示规则要求先补齐税务身份、联系人与品类范围后才能准入。",
+  "Verify service period, contract coverage, payment lag, and variance against the monthly accrual.": "需要核验服务期间、合同覆盖范围、付款滞后情况，并与月度计提偏差对比。",
+  "No. Recognition only creates candidates; a reviewer must confirm each item before it enters the library.": "不能。识别只生成候选项，每条记录必须经复核人确认后才能入库。",
+  "The demo prioritizes regions with high repair score, high benchmark variance, and open contract actions.": "演示会优先推送维修压力高、基准偏差高且存在合同动作的区域。",
+  "No. The demo role matrix limits vendors to scoped contract and material views only.": "不能。演示角色矩阵将供应商限制在范围内合同与材料视图。",
+  "Matched 3 fictional prior cases": "命中 3 条虚构历史案例",
+  "Matched demo rule group CT-02": "命中演示规则组 CT-02",
+  "Matched demo rule group ML-01": "命中演示规则组 ML-01",
+  "Matched demo rule group CM-04": "命中演示规则组 CM-04",
+  "Matched demo rule group AC-03": "命中演示规则组 AC-03",
+  "Local match": "本地匹配",
+  "Vision extract": "识别提取",
+  "Deep answer": "深度回答",
+  "Permission check": "权限检查",
+  "Evidence trace": "证据追踪",
+  Completed: "已完成",
+  Optional: "可选",
+  "Mock only": "仅模拟",
+  "No external model call": "不调用外部模型",
+  "Synthetic document preview": "模拟文档预览",
+  "Disabled in browser-only demo": "浏览器演示中禁用",
+  "Role-scoped mock answer": "按角色范围模拟回答",
+  "Links to fictional rule groups only": "仅链接到虚构规则组",
+  "All Regions": "全部区域",
+  "All Projects": "全部项目",
+  "Region A": "区域 A",
+  "Region B": "区域 B",
+  "Region C": "区域 C",
+  "Region D": "区域 D",
+  "Region E": "区域 E",
+  "Region F": "区域 F",
+  "Region G": "区域 G",
+  "Region H": "区域 H",
+  "Region I": "区域 I",
+  "Region J": "区域 J",
+  "Region K": "区域 K",
+  "Project Alpha": "项目 Alpha",
+  "Project Beta": "项目 Beta",
+  "Project Gamma": "项目 Gamma",
+  "Project Delta": "项目 Delta",
+  "Project Echo": "项目 Echo",
+  "Project Foxtrot": "项目 Foxtrot",
+  "Project Harbor": "项目 Harbor",
+  "Project Iota": "项目 Iota",
+  "Project Jade": "项目 Jade",
+  "Project Kappa": "项目 Kappa",
+  "Project Lumen": "项目 Lumen",
+  "Project Metro": "项目 Metro",
+  "Supplier Alpha": "供应商 Alpha",
+  "Supplier Beta": "供应商 Beta",
+  "Supplier Gamma": "供应商 Gamma",
+  "Supplier Delta": "供应商 Delta",
+  "Supplier Echo": "供应商 Echo",
+  "Supplier Fox": "供应商 Fox",
+  "Supplier Grid": "供应商 Grid",
+  "Supplier Halo": "供应商 Halo",
+  "Supplier Ion": "供应商 Ion",
+  "Supplier Juno": "供应商 Juno",
+  "Supplier Kite": "供应商 Kite",
+  "Supplier Loom": "供应商 Loom",
+  "System Admin": "系统管理员",
+  "HQ Cost Reviewer": "总部成本复核人",
+  "Regional Operator": "区域运营人员",
+  "External Vendor": "外部供应商",
+  Full: "全部",
+  Approve: "审批",
+  Scoped: "范围内",
+  Submit: "提交",
+  None: "无",
+  Configure: "配置",
+  Read: "只读",
+  Limited: "受限",
+  Review: "复核",
+  "Ask only": "仅提问",
+};
+
+function t(value) {
+  if (value == null) return "";
+  return state.language === "zh" ? zh[value] || value : value;
+}
+
+function formatJoin(parts, separator = " / ") {
+  return parts.map((part) => t(part)).join(separator);
+}
 
 function cls(...parts) {
   return parts.filter(Boolean).join(" ");
@@ -84,7 +528,7 @@ function setActive(id) {
 
 function optionList(options, current) {
   return options
-    .map((option) => `<option ${option === current ? "selected" : ""}>${option}</option>`)
+    .map((option) => `<option value="${option}" ${option === current ? "selected" : ""}>${t(option)}</option>`)
     .join("");
 }
 
@@ -98,7 +542,7 @@ function renderShell(content) {
           <div class="brand-mark">PC</div>
           <div>
             <strong>Property Cost AI</strong>
-            <span>Open Demo</span>
+            <span>${t("Open Demo")}</span>
           </div>
         </div>
         <nav class="nav-list" aria-label="Demo modules">
@@ -107,35 +551,39 @@ function renderShell(content) {
               (item) => `
                 <button class="${cls("nav-item", item.id === state.active && "is-active")}" data-nav="${item.id}">
                   <span class="nav-icon">${item.short}</span>
-                  <span>${item.label}</span>
+                  <span>${t(item.label)}</span>
                 </button>
               `,
             )
             .join("")}
         </nav>
         <div class="safety-box">
-          <strong>Demo Boundary</strong>
-          <span>Front-end mock only</span>
-          <span>No database</span>
-          <span>No secrets</span>
+          <strong>${t("Demo Boundary")}</strong>
+          <span>${t("Front-end mock only")}</span>
+          <span>${t("No database")}</span>
+          <span>${t("No secrets")}</span>
         </div>
       </aside>
       <main class="workspace">
         <header class="topbar">
           <div>
-            <p class="eyebrow">${module.summary}</p>
-            <h1>${module.label}</h1>
+            <p class="eyebrow">${t(module.summary)}</p>
+            <h1>${t(module.label)}</h1>
           </div>
           <div class="topbar-actions">
             <label>
-              <span>Region</span>
+              <span>${t("Region")}</span>
               <select id="regionSelect">${optionList(portfolio.regions, state.region)}</select>
             </label>
             <label>
-              <span>Project</span>
+              <span>${t("Project")}</span>
               <select id="projectSelect">${optionList(portfolio.projects, state.project)}</select>
             </label>
-            <span class="mock-pill">Mock Data</span>
+            <div class="language-toggle" role="group" aria-label="Language">
+              <button class="${state.language === "zh" ? "is-active" : ""}" data-lang="zh">中文</button>
+              <button class="${state.language === "en" ? "is-active" : ""}" data-lang="en">EN</button>
+            </div>
+            <span class="mock-pill">${t("Mock Data")}</span>
           </div>
         </header>
         <section class="content">${content}</section>
@@ -172,9 +620,9 @@ function kpiCards(items) {
         .map(
           (item) => `
             <article class="${cls("kpi-card", toneClass(item.tone))}">
-              <span>${item.label}</span>
+              <span>${t(item.label)}</span>
               <strong>${item.value}</strong>
-              <small>${item.delta}</small>
+              <small>${t(item.delta || item.trend || "")}</small>
             </article>
           `,
         )
@@ -207,6 +655,24 @@ function selectedHeatValue() {
   return { row, score: row[key], key };
 }
 
+function contractActionText() {
+  if (state.language === "en") return state.contractAction;
+  const contract = state.contractAction.match(/DEMO-CT-\d{4}-\d{3}/)?.[0] || state.selectedContractNo;
+  if (state.contractAction.startsWith("Selected")) {
+    return `已选择 ${contract} 进行模拟复核。`;
+  }
+  if (state.contractAction.startsWith("Create review task")) {
+    return `已为 ${contract} 记录创建复核任务。`;
+  }
+  if (state.contractAction.startsWith("Request evidence")) {
+    return `已为 ${contract} 记录索要资料动作。`;
+  }
+  if (state.contractAction.startsWith("Simulate approval")) {
+    return `已为 ${contract} 记录模拟审批动作。`;
+  }
+  return "打开风险队列，选择合同，并模拟复核动作。";
+}
+
 function renderPortal() {
   return `
     ${kpiCards(portalStats)}
@@ -215,9 +681,9 @@ function renderPortal() {
         .map(
           (item) => `
             <article class="${cls("command-card", toneClass(item.tone))}">
-              <span>${item.label}</span>
+              <span>${t(item.label)}</span>
               <strong>${item.value}</strong>
-              <small>${item.meta}</small>
+              <small>${t(item.meta)}</small>
             </article>
           `,
         )
@@ -227,10 +693,10 @@ function renderPortal() {
       <section class="panel panel-large">
         <div class="panel-head">
           <div>
-            <h2>Operations Portal</h2>
+            <h2>${t("Operations Portal")}</h2>
             <p>${portfolio.asOf}</p>
           </div>
-          <span class="status-chip">Local Preview</span>
+          <span class="status-chip">${t("Local Preview")}</span>
         </div>
         <div class="module-grid">
           ${modules
@@ -239,8 +705,8 @@ function renderPortal() {
               (item) => `
                 <button class="module-card" data-nav="${item.id}">
                   <span class="module-icon">${item.short}</span>
-                  <strong>${item.label}</strong>
-                  <small>${item.summary}</small>
+                  <strong>${t(item.label)}</strong>
+                  <small>${t(item.summary)}</small>
                 </button>
               `,
             )
@@ -250,36 +716,36 @@ function renderPortal() {
       <section class="panel">
         <div class="panel-head">
           <div>
-            <h2>Module Health</h2>
-            <p>Portfolio-scale public demo snapshot</p>
+            <h2>${t("Module Health")}</h2>
+            <p>${t("Portfolio-scale public demo snapshot")}</p>
           </div>
         </div>
         ${renderTable(
           ["Module", "Coverage", "Signal", "Health"],
           moduleHealth.map((item) => [
-            item.module,
-            item.coverage,
-            item.signal,
-            `<span class="${cls("badge", item.health === "Good" ? "tone-good" : "tone-warning")}">${item.health}</span>`,
+            t(item.module),
+            t(item.coverage),
+            t(item.signal),
+            `<span class="${cls("badge", item.health === "Good" ? "tone-good" : "tone-warning")}">${t(item.health)}</span>`,
           ]),
         )}
       </section>
       <section class="panel">
         <div class="panel-head">
           <div>
-            <h2>Sanitization Rules</h2>
-            <p>Public-safe demo guardrails</p>
+            <h2>${t("Sanitization Rules")}</h2>
+            <p>${t("Public-safe demo guardrails")}</p>
           </div>
         </div>
         <ul class="rule-list">
-          ${safetyRules.map((rule) => `<li>${rule}</li>`).join("")}
+          ${safetyRules.map((rule) => `<li>${t(rule)}</li>`).join("")}
         </ul>
       </section>
       <section class="panel">
         <div class="panel-head">
           <div>
-            <h2>Operations Feed</h2>
-            <p>Fictional control-center activity</p>
+            <h2>${t("Operations Feed")}</h2>
+            <p>${t("Fictional control-center activity")}</p>
           </div>
         </div>
         <div class="feed-list">
@@ -288,8 +754,8 @@ function renderPortal() {
               (item) => `
                 <article>
                   <time>${item.time}</time>
-                  <strong>${item.event}</strong>
-                  <span>${item.owner}</span>
+                  <strong>${t(item.event)}</strong>
+                  <span>${t(item.owner)}</span>
                 </article>
               `,
             )
@@ -299,8 +765,8 @@ function renderPortal() {
       <section class="panel panel-image">
         <div class="panel-head">
           <div>
-            <h2>Design Direction</h2>
-            <p>IMAGE-2 visual advisor output</p>
+            <h2>${t("Design Direction")}</h2>
+            <p>${t("IMAGE-2 visual advisor output")}</p>
           </div>
         </div>
         <img src="./public/assets/design-direction.png" alt="Design mockup direction with fictional data" />
@@ -320,8 +786,8 @@ function renderCost() {
       <section class="panel panel-large">
         <div class="panel-head">
           <div>
-            <h2>Monthly Cost Execution</h2>
-            <p>Budget, actual and paid values are fictional</p>
+            <h2>${t("Monthly Cost Execution")}</h2>
+            <p>${t("Budget, actual and paid values are fictional")}</p>
           </div>
         </div>
         <div class="chart-scroll">
@@ -351,8 +817,8 @@ function renderCost() {
       <section class="panel">
         <div class="panel-head">
           <div>
-            <h2>Action Queue</h2>
-            <p>Variance review workflow</p>
+            <h2>${t("Action Queue")}</h2>
+            <p>${t("Variance review workflow")}</p>
           </div>
         </div>
         <div class="action-list">
@@ -364,35 +830,35 @@ function renderCost() {
             .map(
               (action) => `
                 <button class="${activeAction === action ? "is-active" : ""}" data-cost-action="${action}">
-                  ${action}
+                  ${t(action)}
                 </button>
               `,
             )
             .join("")}
         </div>
         <div class="action-result">
-          <strong>${activeAction}</strong>
-          <span>${scopedRows.length} scoped rows ready for mock review.</span>
+          <strong>${t(activeAction)}</strong>
+          <span>${scopedRows.length} ${state.language === "zh" ? "条模拟记录可复核" : "scoped rows ready for mock review."}</span>
         </div>
       </section>
     </div>
     <section class="panel">
       <div class="panel-head">
         <div>
-          <h2>Cost Subjects</h2>
-          <p>Scoped by ${state.region} / ${state.project}</p>
+          <h2>${t("Cost Subjects")}</h2>
+          <p>${t("Scoped by")} ${formatJoin([state.region, state.project])}</p>
         </div>
       </div>
       ${renderTable(
         ["Area", "Project", "Subject", "Budget", "Actual", "Variance", "Owner"],
         scopedRows.map((row) => [
-          row.area,
-          row.project,
-          row.subject,
+          t(row.area),
+          t(row.project),
+          t(row.subject),
           row.budget,
           row.actual,
           `<span class="${cls("badge", toneClass(row.tone))}">${row.variance}</span>`,
-          row.owner,
+          t(row.owner),
         ]),
       )}
     </section>
@@ -413,31 +879,31 @@ function renderMaterials() {
       <section class="panel panel-large">
         <div class="panel-head">
           <div>
-            <h2>Material Price Library</h2>
-            <p>Reviewer-confirmed synthetic prices</p>
+            <h2>${t("Material Price Library")}</h2>
+            <p>${t("Reviewer-confirmed synthetic prices")}</p>
           </div>
-          <input id="materialSearch" class="search-input" value="${state.materialQuery}" placeholder="Search material or supplier" />
+          <input id="materialSearch" class="search-input" value="${state.materialQuery}" placeholder="${t("Search material or supplier")}" />
         </div>
         ${renderTable(
           ["Material", "Category", "Unit", "City", "Supplier", "Current", "Tax", "Change", "Status"],
           rows.map((item) => [
-            item.name,
-            item.category,
+            t(item.name),
+            t(item.category),
             item.unit,
-            item.city,
-            item.supplier,
+            t(item.city),
+            t(item.supplier),
             item.current,
             item.tax,
             item.change,
-            `<span class="${cls("badge", item.status === "Confirmed" ? "tone-good" : "tone-warning")}">${item.status}</span>`,
+            `<span class="${cls("badge", item.status === "Confirmed" ? "tone-good" : "tone-warning")}">${t(item.status)}</span>`,
           ]),
         )}
       </section>
       <section class="panel">
         <div class="panel-head">
           <div>
-            <h2>AI Import Mock</h2>
-            <p>Candidate generation, edit and confirm</p>
+            <h2>${t("AI Import Mock")}</h2>
+            <p>${t("Candidate generation, edit and confirm")}</p>
           </div>
         </div>
         <ol class="step-list interactive-steps">
@@ -445,20 +911,20 @@ function renderMaterials() {
             .map(
               (step, index) => `
                 <li class="${index + 1 <= state.materialStep ? "is-complete" : ""}">
-                  <strong>${step}</strong>
-                  <span>${index + 1 === state.materialStep ? "Current mock step" : index + 1 < state.materialStep ? "Completed in browser state" : "Pending"}</span>
+                  <strong>${t(step)}</strong>
+                  <span>${t(index + 1 === state.materialStep ? "Current mock step" : index + 1 < state.materialStep ? "Completed in browser state" : "Pending")}</span>
                 </li>
               `,
             )
             .join("")}
         </ol>
         <div class="inline-actions">
-          <button data-material-step="reset">Reset</button>
-          <button class="primary-action" data-material-step="next">${state.materialStep >= 4 ? "Run Again" : "Advance Step"}</button>
+          <button data-material-step="reset">${t("Reset")}</button>
+          <button class="primary-action" data-material-step="next">${t(state.materialStep >= 4 ? "Run Again" : "Advance Step")}</button>
         </div>
         <div class="detail-card">
-          <span>Selected Candidate</span>
-          <strong>${selectedCandidate.extracted}</strong>
+          <span>${t("Selected Candidate")}</span>
+          <strong>${t(selectedCandidate.extracted)}</strong>
           <small>${selectedCandidate.source} - ${selectedCandidate.confidence} confidence</small>
         </div>
       </section>
@@ -466,20 +932,20 @@ function renderMaterials() {
     <section class="panel">
       <div class="panel-head">
         <div>
-          <h2>Recognition Candidates</h2>
-          <p>No external model is called in this browser-only demo</p>
+          <h2>${t("Recognition Candidates")}</h2>
+          <p>${t("No external model is called in this browser-only demo")}</p>
         </div>
       </div>
       ${renderTable(
         ["Source File", "Extracted Item", "Confidence", "Reviewer Action", "State"],
         materialCandidates.map((item) => [
           item.source,
-          `<button class="link-button" data-candidate="${item.extracted}">${item.extracted}</button>`,
+          `<button class="link-button" data-candidate="${item.extracted}">${t(item.extracted)}</button>`,
           item.confidence,
-          item.action,
+          t(item.action),
           state.confirmedCandidates.has(item.extracted)
-            ? `<span class="badge tone-good">Confirmed</span>`
-            : `<button class="mini-action" data-confirm-candidate="${item.extracted}">Confirm</button>`,
+            ? `<span class="badge tone-good">${t("Confirmed")}</span>`
+            : `<button class="mini-action" data-confirm-candidate="${item.extracted}">${t("Confirm")}</button>`,
         ]),
       )}
     </section>
@@ -496,10 +962,10 @@ function renderCostMap() {
     <section class="panel cost-command-panel">
       <div class="panel-head">
         <div>
-          <h2>Regional Cost Command Center</h2>
-          <p>12-region synthetic benchmark model with prioritized action value</p>
+          <h2>${t("Regional Cost Command Center")}</h2>
+          <p>${t("12-region synthetic benchmark model with prioritized action value")}</p>
         </div>
-        <span class="status-chip">$4.30M demo savings pool</span>
+        <span class="status-chip">${t("$4.30M demo savings pool")}</span>
       </div>
       <div class="action-impact-grid">
         ${costMapActions
@@ -507,9 +973,9 @@ function renderCostMap() {
           .map(
             (item) => `
               <article class="${item.action === state.activeCostAction ? "is-active" : ""}">
-                <span>${item.action}</span>
+                <span>${t(item.action)}</span>
                 <strong>${item.impact}</strong>
-                <small>${item.scope} - ${item.owner}</small>
+                <small>${t(item.scope)} - ${t(item.owner)}</small>
               </article>
             `,
           )
@@ -519,20 +985,20 @@ function renderCostMap() {
     <section class="panel panel-large">
       <div class="panel-head">
         <div>
-          <h2>Cost Pressure Heat Matrix</h2>
-          <p>Fictional score by region and major operating category</p>
+          <h2>${t("Cost Pressure Heat Matrix")}</h2>
+          <p>${t("Fictional score by region and major operating category")}</p>
         </div>
       </div>
       <div class="heatmap" role="table" aria-label="Cost pressure heat matrix">
         <div class="heat-row heat-head" role="row">
-          <span role="columnheader">Region</span>
-          ${heatHeaders.map((header) => `<span role="columnheader">${header}</span>`).join("")}
+          <span role="columnheader">${t("Region")}</span>
+          ${heatHeaders.map((header) => `<span role="columnheader">${t(header)}</span>`).join("")}
         </div>
         ${costMapMatrix
           .map(
             (row) => `
               <div class="heat-row" role="row">
-                <strong role="rowheader">${row.region}</strong>
+                <strong role="rowheader">${t(row.region)}</strong>
                 <button class="${cls("heat-cell", `heat-${heatTone(row.security)}`, state.selectedHeat.region === row.region && state.selectedHeat.category === "Security" && "is-active")}" data-heat-region="${row.region}" data-heat-category="Security">${row.security}</button>
                 <button class="${cls("heat-cell", `heat-${heatTone(row.cleaning)}`, state.selectedHeat.region === row.region && state.selectedHeat.category === "Cleaning" && "is-active")}" data-heat-region="${row.region}" data-heat-category="Cleaning">${row.cleaning}</button>
                 <button class="${cls("heat-cell", `heat-${heatTone(row.landscape)}`, state.selectedHeat.region === row.region && state.selectedHeat.category === "Landscape" && "is-active")}" data-heat-region="${row.region}" data-heat-category="Landscape">${row.landscape}</button>
@@ -545,14 +1011,14 @@ function renderCostMap() {
       </div>
       <div class="insight-strip">
         <article>
-          <span>Selected Signal</span>
-          <strong>${state.selectedHeat.region} / ${state.selectedHeat.category}</strong>
-          <small>Pressure score ${heat.score}, priority ${heatTone(heat.score)}</small>
+          <span>${t("Selected Signal")}</span>
+          <strong>${formatJoin([state.selectedHeat.region, state.selectedHeat.category])}</strong>
+          <small>${t("Pressure score")} ${heat.score}, ${t("priority")} ${t(heatTone(heat.score))}</small>
         </article>
         <article>
-          <span>Suggested Action</span>
-          <strong>${activeAction.action}</strong>
-          <small>${activeAction.impact} estimated impact, owner ${activeAction.owner}</small>
+          <span>${t("Suggested Action")}</span>
+          <strong>${t(activeAction.action)}</strong>
+          <small>${activeAction.impact} ${t("estimated impact, owner")} ${t(activeAction.owner)}</small>
         </article>
       </div>
     </section>
@@ -563,17 +1029,17 @@ function renderCostMap() {
             <article class="panel region-card">
               <div class="panel-head">
                 <div>
-                  <h2>${item.region}</h2>
-                  <p>Benchmark ${item.benchmark}</p>
+                  <h2>${t(item.region)}</h2>
+                  <p>${t("Benchmark")} ${item.benchmark}</p>
                 </div>
                 <span class="${cls("badge", item.grade === "A" ? "tone-good" : item.grade === "B" ? "tone-warning" : "tone-danger")}">Grade ${item.grade}</span>
               </div>
               <div class="metric-line">
-                <span>Variance</span>
+                <span>${t("Variance")}</span>
                 <strong>${item.variance}</strong>
               </div>
               <div class="driver-list">
-                ${item.drivers.map((driver) => `<span>${driver}</span>`).join("")}
+                ${item.drivers.map((driver) => `<span>${t(driver)}</span>`).join("")}
               </div>
             </article>
           `,
@@ -583,17 +1049,17 @@ function renderCostMap() {
     <section class="panel">
       <div class="panel-head">
         <div>
-          <h2>Standard Item Benchmarks</h2>
-          <p>Current effective price only, no historical source files</p>
+          <h2>${t("Standard Item Benchmarks")}</h2>
+          <p>${t("Current effective price only, no historical source files")}</p>
         </div>
       </div>
       ${renderTable(
         ["Cost Item", "Demo Standard", "Current Price", "State", "Progress"],
         costMapItems.map((item, index) => [
-          item.item,
+          t(item.item),
           item.standard,
           item.current,
-          `<span class="${cls("badge", item.state === "Normal" ? "tone-good" : "tone-warning")}">${item.state}</span>`,
+          `<span class="${cls("badge", item.state === "Normal" ? "tone-good" : "tone-warning")}">${t(item.state)}</span>`,
           progressBar(72 - index * 8, item.state === "Normal" ? "good" : "warning"),
         ]),
       )}
@@ -601,17 +1067,17 @@ function renderCostMap() {
     <section class="panel">
       <div class="panel-head">
         <div>
-          <h2>Prioritized Action Pool</h2>
-          <p>Demo recommendations for procurement, contract and engineering follow-up</p>
+          <h2>${t("Prioritized Action Pool")}</h2>
+          <p>${t("Demo recommendations for procurement, contract and engineering follow-up")}</p>
         </div>
       </div>
       ${renderTable(
         ["Action", "Estimated Impact", "Scope", "Owner"],
         costMapActions.map((item) => [
-          `<button class="link-button" data-cost-action="${item.action}">${item.action}</button>`,
+          `<button class="link-button" data-cost-action="${item.action}">${t(item.action)}</button>`,
           item.impact,
-          item.scope,
-          item.owner,
+          t(item.scope),
+          t(item.owner),
         ]),
       )}
     </section>
@@ -641,66 +1107,66 @@ function renderContracts() {
       <section class="panel panel-large">
         <div class="panel-head">
           <div>
-            <h2>Payment Progress Exposure</h2>
-            <p>${rows.length} mock contracts in current view</p>
+            <h2>${t("Payment Progress Exposure")}</h2>
+            <p>${rows.length} ${t("mock contracts in current view")}</p>
           </div>
           <div class="segmented" role="group" aria-label="Risk filter">
             ${["All", "High", "Medium", "Low"]
-              .map((risk) => `<button class="${state.contractRisk === risk ? "is-active" : ""}" data-risk="${risk}">${risk}</button>`)
+              .map((risk) => `<button class="${state.contractRisk === risk ? "is-active" : ""}" data-risk="${risk}">${t(risk)}</button>`)
               .join("")}
           </div>
         </div>
-        <input id="contractSearch" class="search-input full-width" value="${state.contractSearch}" placeholder="Search contract, vendor or reason" />
+        <input id="contractSearch" class="search-input full-width" value="${state.contractSearch}" placeholder="${t("Search contract, vendor or reason")}" />
         ${renderTable(
           ["Contract", "Project", "Vendor", "Category", "Amount", "Paid", "Risk", "Reason"],
           rows.map((item) => [
             `<button class="link-button" data-contract="${item.no}">${item.no}</button>`,
-            item.project,
-            item.vendor,
-            item.category,
+            t(item.project),
+            t(item.vendor),
+            t(item.category),
             item.amount,
             item.paid,
-            `<span class="${cls("badge", riskTone(item.risk))}">${item.risk}</span>`,
-            item.reason,
+            `<span class="${cls("badge", riskTone(item.risk))}">${t(item.risk)}</span>`,
+            t(item.reason),
           ]),
         )}
       </section>
       <aside class="panel detail-panel">
         <div class="panel-head">
           <div>
-            <h2>Contract Detail</h2>
-            <p>Click a row to update this mock drawer</p>
+            <h2>${t("Contract Detail")}</h2>
+            <p>${t("Click a row to update this mock drawer")}</p>
           </div>
-          <span class="${cls("badge", riskTone(selected.risk))}">${selected.risk}</span>
+          <span class="${cls("badge", riskTone(selected.risk))}">${t(selected.risk)}</span>
         </div>
         <div class="detail-card">
           <span>${selected.no}</span>
-          <strong>${selected.project}</strong>
-          <small>${selected.vendor} - ${selected.category}</small>
+          <strong>${t(selected.project)}</strong>
+          <small>${t(selected.vendor)} - ${t(selected.category)}</small>
         </div>
         <div class="metric-line">
-          <span>Amount</span>
+          <span>${t("Amount")}</span>
           <strong>${selected.amount}</strong>
         </div>
         <div class="metric-line">
-          <span>Paid Progress</span>
+          <span>${t("Paid Progress")}</span>
           <strong>${selected.paid}</strong>
         </div>
         ${progressBar(paid, selected.risk === "High" ? "warning" : "good")}
         <ol class="timeline">
-          <li class="is-done"><strong>Signed</strong><span>Mock contract ledger created</span></li>
-          <li class="is-done"><strong>Service Period</strong><span>Monthly service tracking active</span></li>
-          <li class="${paid >= 70 ? "is-done" : "is-current"}"><strong>Payment Review</strong><span>${selected.reason}</span></li>
-          <li><strong>Closeout</strong><span>Pending final synthetic evidence</span></li>
+          <li class="is-done"><strong>${t("Signed")}</strong><span>${t("Mock contract ledger created")}</span></li>
+          <li class="is-done"><strong>${t("Service Period")}</strong><span>${t("Monthly service tracking active")}</span></li>
+          <li class="${paid >= 70 ? "is-done" : "is-current"}"><strong>${t("Payment Review")}</strong><span>${t(selected.reason)}</span></li>
+          <li><strong>${t("Closeout")}</strong><span>${t("Pending final synthetic evidence")}</span></li>
         </ol>
         <div class="inline-actions">
-          <button data-contract-action="Create review task">Create Task</button>
-          <button data-contract-action="Request evidence">Request Evidence</button>
-          <button class="primary-action" data-contract-action="Simulate approval">Simulate Approval</button>
+          <button data-contract-action="Create review task">${t("Create Task")}</button>
+          <button data-contract-action="Request evidence">${t("Request Evidence")}</button>
+          <button class="primary-action" data-contract-action="Simulate approval">${t("Simulate Approval")}</button>
         </div>
         <div class="action-result">
-          <strong>Latest Mock Action</strong>
-          <span>${state.contractAction}</span>
+          <strong>${t("Latest Mock Action")}</strong>
+          <span>${contractActionText()}</span>
         </div>
       </aside>
     </div>
@@ -708,27 +1174,27 @@ function renderContracts() {
       <section class="panel">
         <div class="panel-head">
           <div>
-            <h2>Risk Logic</h2>
-            <p>First-stage public demo rules</p>
+            <h2>${t("Risk Logic")}</h2>
+            <p>${t("First-stage public demo rules")}</p>
           </div>
         </div>
         <ul class="rule-list">
-          <li>Monthly service contracts track paid-through month.</li>
-          <li>Other contracts track cumulative payment ratio.</li>
-          <li>Risk labels are generated from fake amounts and dates.</li>
+          <li>${t("Monthly service contracts track paid-through month.")}</li>
+          <li>${t("Other contracts track cumulative payment ratio.")}</li>
+          <li>${t("Risk labels are generated from fake amounts and dates.")}</li>
         </ul>
       </section>
       <section class="panel">
         <div class="panel-head">
           <div>
-            <h2>Audit Boundary</h2>
-            <p>What this demo does not include</p>
+            <h2>${t("Audit Boundary")}</h2>
+            <p>${t("What this demo does not include")}</p>
           </div>
         </div>
         <ul class="rule-list">
-          <li>No real contract files.</li>
-          <li>No real payment ledger.</li>
-          <li>No production attachment workflow.</li>
+          <li>${t("No real contract files.")}</li>
+          <li>${t("No real payment ledger.")}</li>
+          <li>${t("No production attachment workflow.")}</li>
         </ul>
       </section>
     </div>
@@ -743,32 +1209,32 @@ function renderSmartQA() {
       <section class="panel panel-large">
         <div class="panel-head">
           <div>
-            <h2>Smart Q&A Workbench</h2>
-            <p>Local match first; vision and deep answer are explicit actions</p>
+            <h2>${t("Smart Q&A Workbench")}</h2>
+            <p>${t("Local match first; vision and deep answer are explicit actions")}</p>
           </div>
           <div class="segmented">
             ${["Local match", "Vision extract", "Deep answer"]
-              .map((mode) => `<button class="${state.qaMode === mode ? "is-active" : ""}" data-qa-mode="${mode}">${mode}</button>`)
+              .map((mode) => `<button class="${state.qaMode === mode ? "is-active" : ""}" data-qa-mode="${mode}">${t(mode)}</button>`)
               .join("")}
           </div>
         </div>
         <div class="chat-panel">
-          <div class="chat user">${state.qaQuestion}</div>
+          <div class="chat user">${t(state.qaQuestion)}</div>
           <div class="chat system">
-            <strong>${currentCase.answer}</strong>
-            <span>${currentCase.evidence}</span>
+            <strong>${t(currentCase.answer)}</strong>
+            <span>${t(currentCase.evidence)}</span>
           </div>
         </div>
         <div class="input-row">
           <input id="qaInput" value="${state.qaQuestion}" aria-label="Mock question" />
-          <button id="qaAsk">Get Answer</button>
+          <button id="qaAsk">${t("Get Answer")}</button>
         </div>
       </section>
       <section class="panel">
         <div class="panel-head">
           <div>
-            <h2>Knowledge Cases</h2>
-            <p>Fictional examples only</p>
+            <h2>${t("Knowledge Cases")}</h2>
+            <p>${t("Fictional examples only")}</p>
           </div>
         </div>
         <div class="case-list">
@@ -776,10 +1242,10 @@ function renderSmartQA() {
             .map(
               (item) => `
                 <article>
-                  <span>${item.flow}</span>
-                  <strong>${item.question}</strong>
-                  <small>${item.evidence}</small>
-                  <button class="mini-action" data-qa-case="${qaCases.indexOf(item)}">Use Case</button>
+                  <span>${t(item.flow)}</span>
+                  <strong>${t(item.question)}</strong>
+                  <small>${t(item.evidence)}</small>
+                  <button class="mini-action" data-qa-case="${qaCases.indexOf(item)}">${t("Use Case")}</button>
                 </article>
               `,
             )
@@ -790,16 +1256,16 @@ function renderSmartQA() {
     <section class="panel">
       <div class="panel-head">
         <div>
-          <h2>AI Audit Trail</h2>
-          <p>Shows cost-control behavior without real model calls</p>
+          <h2>${t("AI Audit Trail")}</h2>
+          <p>${t("Shows cost-control behavior without real model calls")}</p>
         </div>
       </div>
       ${renderTable(
         ["Action", "State", "Note"],
         qaAudit.map((item) => [
-          item.type,
-          `<span class="badge tone-neutral">${item.state}</span>`,
-          item.note,
+          t(item.type),
+          `<span class="badge tone-neutral">${t(item.state)}</span>`,
+          t(item.note),
         ]),
       )}
     </section>
@@ -814,41 +1280,41 @@ function renderAccounts() {
       <section class="panel panel-large">
         <div class="panel-head">
           <div>
-            <h2>Role Matrix</h2>
-            <p>Select a role to preview masked access</p>
+            <h2>${t("Role Matrix")}</h2>
+            <p>${t("Select a role to preview masked access")}</p>
           </div>
         </div>
         ${renderTable(
           ["Role", "Cost", "Materials", "Contracts", "Smart Q&A", "Accounts"],
           roles.map((item) => [
-            `<button class="link-button" data-role="${item.role}">${item.role}</button>`,
-            item.cost,
-            item.materials,
-            item.contracts,
-            item.qa,
-            item.account,
+            `<button class="link-button" data-role="${item.role}">${t(item.role)}</button>`,
+            t(item.cost),
+            t(item.materials),
+            t(item.contracts),
+            t(item.qa),
+            t(item.account),
           ]),
         )}
       </section>
       <aside class="panel detail-panel">
         <div class="panel-head">
           <div>
-            <h2>Permission Preview</h2>
-            <p>Current selected demo role</p>
+            <h2>${t("Permission Preview")}</h2>
+            <p>${t("Current selected demo role")}</p>
           </div>
-          <span class="status-chip">${selectedRole.role}</span>
+          <span class="status-chip">${t(selectedRole.role)}</span>
         </div>
         <div class="permission-preview">
-          <article><span>Cost</span><strong>${selectedRole.cost}</strong></article>
-          <article><span>Materials</span><strong>${selectedRole.materials}</strong></article>
-          <article><span>Contracts</span><strong>${selectedRole.contracts}</strong></article>
-          <article><span>Smart Q&A</span><strong>${selectedRole.qa}</strong></article>
-          <article><span>Accounts</span><strong>${selectedRole.account}</strong></article>
+          <article><span>${t("Cost")}</span><strong>${t(selectedRole.cost)}</strong></article>
+          <article><span>${t("Materials")}</span><strong>${t(selectedRole.materials)}</strong></article>
+          <article><span>${t("Contracts")}</span><strong>${t(selectedRole.contracts)}</strong></article>
+          <article><span>${t("Smart Q&A")}</span><strong>${t(selectedRole.qa)}</strong></article>
+          <article><span>${t("Accounts")}</span><strong>${t(selectedRole.account)}</strong></article>
         </div>
         <div class="mask-demo">
-          <span>Contract Amount</span>
+          <span>${t("Contract Amount")}</span>
           <strong>${selectedRole.contracts === "Limited" || selectedRole.contracts === "None" ? "$***,***" : "$96.8M"}</strong>
-          <small>${selectedRole.contracts === "Limited" || selectedRole.contracts === "None" ? "Masked by selected role" : "Visible in demo role"}</small>
+          <small>${t(selectedRole.contracts === "Limited" || selectedRole.contracts === "None" ? "Masked by selected role" : "Visible in demo role")}</small>
         </div>
       </aside>
     </div>
@@ -856,14 +1322,14 @@ function renderAccounts() {
       <section class="panel">
         <div class="panel-head">
           <div>
-            <h2>Approval Flow</h2>
-            <p>Mock account governance</p>
+            <h2>${t("Approval Flow")}</h2>
+            <p>${t("Mock account governance")}</p>
           </div>
         </div>
         <ol class="step-list">
-          <li><strong>Request</strong><span>Operator submits scoped access</span></li>
-          <li><strong>Review</strong><span>HQ reviewer validates role and project scope</span></li>
-          <li><strong>Activate</strong><span>Admin grants demo access</span></li>
+          <li><strong>${t("Request")}</strong><span>${t("Operator submits scoped access")}</span></li>
+          <li><strong>${t("Review")}</strong><span>${t("HQ reviewer validates role and project scope")}</span></li>
+          <li><strong>${t("Activate")}</strong><span>${t("Admin grants demo access")}</span></li>
         </ol>
       </section>
     </div>
@@ -875,10 +1341,20 @@ function renderTable(headers, rows) {
     <div class="table-wrap">
       <table>
         <thead>
-          <tr>${headers.map((header) => `<th>${header}</th>`).join("")}</tr>
+          <tr>${headers.map((header) => `<th>${t(header)}</th>`).join("")}</tr>
         </thead>
         <tbody>
-          ${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}
+          ${rows
+            .map(
+              (row) =>
+                `<tr>${row
+                  .map((cell) => {
+                    const value = String(cell ?? "");
+                    return `<td>${value.includes("<") ? value : t(value)}</td>`;
+                  })
+                  .join("")}</tr>`,
+            )
+            .join("")}
         </tbody>
       </table>
     </div>
@@ -901,6 +1377,14 @@ function render() {
 }
 
 function bindPage() {
+  document.querySelectorAll("[data-lang]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.language = button.dataset.lang;
+      localStorage.setItem("demo-language", state.language);
+      render();
+    });
+  });
+
   document.querySelectorAll("[data-cost-action]").forEach((button) => {
     button.addEventListener("click", () => {
       state.activeCostAction = button.dataset.costAction;
