@@ -8,19 +8,20 @@ The demo can be hosted as static files, but the browser experience is interactiv
 
 The interface supports Chinese and English. Chinese is the default language because the operating scenarios are closer to Chinese property/procurement workflows, while English remains available for GitHub portfolio display.
 
-Current focus: this repository is being refined locally from a module showcase into a guided business-scenario demo. It is not ready for public promotion yet.
+Current focus: this repository is being refined locally from a module showcase into a portfolio-ready business-scenario demo. It is not connected to any public remote yet.
 
 ## What It Shows
 
-- Portal home for module routing
+- Executive cockpit first screen with portfolio KPIs, risk rail, savings leaderboard and AI evidence trail
 - Chinese / English language switch with local browser state
 - Guided business scenarios that connect material import, price library review, cost-map anomaly, contract risk, Smart Q&A and permission masking
 - Closed-loop scenario engine with local progress, operation log, evidence chain, role perspective and generated decision summary
+- One-click business-chain simulation that completes a full sanitized workflow in browser state
 - Portfolio command center with synthetic region, project and risk signals
 - Cost overview with 12-month budget, actual, paid and variance mock data
 - Material price library with reviewer-confirmed rows and AI import candidates
 - Material AI import flow with upload, recognition, review and confirm mock steps
-- Cost map with clickable regional benchmark cards, pressure heat matrix and action pool
+- Cost map with regional battle-map ranking, risk radar, pressure heat matrix and action pool
 - Contract payment progress, risk filtering, searchable ledger and detail drawer actions
 - Smart Q&A with typed questions, case matching, vision extract and deep answer mock states
 - Account and permission center with selectable roles and visitor masking
@@ -45,6 +46,13 @@ The scenario page behaves like a browser-only operations workbench:
 - Mock actions mark steps complete and append operation-log entries.
 - Role view changes evidence masking without calling any account service.
 - Decision summaries are generated from fictional scenario state only.
+
+The executive cockpit adds a GitHub-friendly first impression:
+
+- a high-density operating snapshot instead of a simple module menu;
+- a one-click chain that runs material import, cost anomaly, contract risk, Smart Q&A and permission masking;
+- a regional battle-map preview that links pressure rankings to savings actions;
+- an evidence trail that shows how modules connect without exposing real attachments.
 
 ## Demo Data Notice
 

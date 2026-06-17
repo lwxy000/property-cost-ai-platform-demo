@@ -51,7 +51,7 @@ function createScenarioRuns() {
 }
 
 const state = {
-  active: "scenarios",
+  active: "portal",
   language: localStorage.getItem("demo-language") || "zh",
   region: "All Regions",
   project: "All Projects",
@@ -78,6 +78,8 @@ const state = {
 
 const zh = {
   Portal: "门户首页",
+  "Executive Cockpit": "经营驾驶舱",
+  "Portfolio command cockpit and demo launchpad": "组合经营总控与演示启动台",
   Scenarios: "业务场景",
   "Guided workflows from import to decision": "从导入到决策的业务链路演示",
   "Cost Overview": "成本总览",
@@ -198,6 +200,19 @@ const zh = {
   "Reviewer Action": "复核动作",
   State: "状态",
   "Regional Cost Command Center": "区域成本指挥中心",
+  "Regional Battle Map": "区域战情图",
+  "Highest pressure regions and linked savings actions": "高压区域与关联节降动作",
+  "Regional ranking": "区域排名",
+  "Selected battle region": "选中战区",
+  "Regional risk radar": "区域风险雷达",
+  "Linked evidence trail": "关联依据链",
+  "Top pressure": "最高压力",
+  "Average score": "平均分",
+  "Peak category": "峰值品类",
+  "Savings owner": "节降负责人",
+  "Action linked": "已关联动作",
+  Driver: "驱动因素",
+  "No production files attached": "未附带生产文件",
   "12-region synthetic benchmark model with prioritized action value": "12 区域模拟基准模型与动作价值排序",
   "$4.30M demo savings pool": "$4.30M 演示节降池",
   "Cost Pressure Heat Matrix": "成本压力热力矩阵",
@@ -304,6 +319,27 @@ const zh = {
   Activate: "启用",
   "Admin grants demo access": "管理员授予演示权限",
   "Business Scenario Demo": "业务场景演示",
+  "Portfolio operating command": "组合经营总控",
+  "Sanitized executive view across cost, material, contract, AI and permission workflows.": "跨成本、材料、合同、AI 与权限流程的脱敏经营视图。",
+  "Demo launchpad": "演示启动台",
+  "One-click business chain": "一键业务链",
+  "AI import to decision-ready evidence trail": "从 AI 导入到可决策依据链",
+  "Run full business chain": "一键跑完整链路",
+  "Open scenario engine": "打开场景引擎",
+  "Open regional battle map": "打开区域战情图",
+  "Decision Ready": "可决策",
+  "Scenario progress": "场景进度",
+  "Chain completed": "链路已跑通",
+  "Chain not complete": "链路待跑通",
+  "Risk command rail": "风险指挥栏",
+  "Board-level fictional alerts": "董事会口径虚构预警",
+  "Savings Leaderboard": "节降机会榜",
+  "Top actions by synthetic impact": "按虚构影响金额排序",
+  "AI Evidence Trail": "AI 依据链",
+  "Signals surfaced from local browser state only": "仅来自浏览器本地状态的模拟信号",
+  "Launch modules": "模块启动台",
+  "Open module workbench": "打开模块工作台",
+  "View full cost map": "查看完整成本地图",
   "Guided scenario paths": "业务链路路径",
   "Module views remain available, but the demo now leads with end-to-end work scenes.": "模块视图仍然保留，但演示现在优先呈现端到端业务场景。",
   "Start scenario": "进入场景",
@@ -353,6 +389,9 @@ const zh = {
   "Marked complete": "已标记完成",
   "Ready for management review": "可提交管理复核",
   "Requires more evidence": "仍需补充依据",
+  "Full business chain completed": "完整业务链路已跑通",
+  "Full business chain completed.": "完整业务链路已跑通。",
+  "Material import, cost anomaly, contract risk, Smart Q&A and permission masking completed in demo state.": "材料导入、成本异常、合同风险、智能问答与权限脱敏已在演示状态中跑通。",
   "In progress": "进行中",
   Ready: "就绪",
   Done: "已完成",
@@ -928,6 +967,72 @@ function selectedHeatValue() {
   return { row, score: row[key], key };
 }
 
+const costMapCategories = [
+  { label: "Security", key: "security" },
+  { label: "Cleaning", key: "cleaning" },
+  { label: "Landscape", key: "landscape" },
+  { label: "Elevator", key: "elevator" },
+  { label: "Repair", key: "repair" },
+];
+
+function rankedCostRegions() {
+  return costMapMatrix
+    .map((row) => {
+      const categoryScores = costMapCategories.map((category) => ({
+        ...category,
+        score: row[category.key],
+      }));
+      const peak = categoryScores.reduce((best, item) => (item.score > best.score ? item : best), categoryScores[0]);
+      const average = Math.round(
+        categoryScores.reduce((sum, item) => sum + item.score, 0) / categoryScores.length,
+      );
+      const region = costMapRegions.find((item) => item.region === row.region);
+      return {
+        ...row,
+        average,
+        peak,
+        benchmark: region?.benchmark || "$4.00 / m2",
+        variance: region?.variance || "+0.0%",
+        grade: region?.grade || "B",
+        drivers: region?.drivers || [],
+      };
+    })
+    .sort((a, b) => b.average - a.average);
+}
+
+function selectedBattleRegion() {
+  const ranked = rankedCostRegions();
+  return ranked.find((item) => item.region === state.selectedHeat.region) || ranked[0];
+}
+
+function impactValue(impact) {
+  return Number.parseFloat(String(impact).replace(/[^0-9.]/g, "")) || 0;
+}
+
+function topSavingsActions() {
+  return [...costMapActions].sort((a, b) => impactValue(b.impact) - impactValue(a.impact));
+}
+
+function runFullBusinessChain() {
+  const scenario = scenarioJourneys[0];
+  const run = scenarioRun(scenario);
+  state.activeScenario = scenario.id;
+  state.activeScenarioStep = scenario.steps.length - 1;
+  run.completedSteps = scenario.steps.map((step, index) => index);
+  run.decision = true;
+  run.log = [
+    {
+      time: demoClock(),
+      actor: "AI Assistant",
+      step: "Decision Summary",
+      action: "Full business chain completed",
+      result: "Material import, cost anomaly, contract risk, Smart Q&A and permission masking completed in demo state.",
+    },
+    ...run.log,
+  ].slice(0, 7);
+  state.scenarioAction = "Full business chain completed.";
+}
+
 function renderScenarioCards() {
   return `
     <div class="scenario-card-grid">
@@ -1006,21 +1111,172 @@ function scenarioTone(stateText) {
 }
 
 function renderPortal() {
+  const scenario = scenarioJourneys[0];
+  const run = scenarioRun(scenario);
+  const progress = scenarioProgress(scenario, run);
+  const rankedRegions = rankedCostRegions();
+  const battleRegion = selectedBattleRegion();
+  const savingsActions = topSavingsActions();
+  const evidenceTrail = scenario.steps.flatMap((item) => item.evidence.map((evidence) => ({
+    step: item.label,
+    module: item.module,
+    evidence,
+  })));
+  const chainDone = progress.percent === 100;
+
   return `
-    ${kpiCards(portalStats)}
-    <section class="command-grid" aria-label="Portfolio command center">
-      ${commandCenter
-        .map(
-          (item) => `
-            <article class="${cls("command-card", toneClass(item.tone))}">
-              <span>${t(item.label)}</span>
-              <strong>${item.value}</strong>
-              <small>${t(item.meta)}</small>
-            </article>
-          `,
-        )
-        .join("")}
+    <section class="cockpit-hero panel">
+      <div class="cockpit-hero-copy">
+        <p class="eyebrow">${t("Portfolio operating command")}</p>
+        <h2>${t("Executive Cockpit")}</h2>
+        <p>${t("Sanitized executive view across cost, material, contract, AI and permission workflows.")}</p>
+        <div class="inline-actions">
+          <button class="primary-action" data-cockpit-run>${t("Run full business chain")}</button>
+          <button data-nav="scenarios">${t("Open scenario engine")}</button>
+          <button data-nav="costMap">${t("Open regional battle map")}</button>
+        </div>
+      </div>
+      <div class="cockpit-kpi-grid">
+        ${portalStats
+          .map(
+            (item) => `
+              <article>
+                <span>${t(item.label)}</span>
+                <strong>${item.value}</strong>
+                <small>${t(item.trend)}</small>
+              </article>
+            `,
+          )
+          .join("")}
+      </div>
     </section>
+
+    <div class="cockpit-layout">
+      <section class="panel panel-large launchpad-panel">
+        <div class="panel-head">
+          <div>
+            <h2>${t("One-click business chain")}</h2>
+            <p>${t("AI import to decision-ready evidence trail")}</p>
+          </div>
+          <span class="${cls("badge", chainDone ? "tone-good" : "tone-warning")}">${t(chainDone ? "Decision Ready" : "Chain not complete")}</span>
+        </div>
+        <div class="chain-progress-line">
+          <div>
+            <span>${t("Scenario progress")}</span>
+            <strong>${progress.completed}/${progress.total}</strong>
+          </div>
+          ${progressBar(progress.percent, chainDone ? "good" : "warning")}
+        </div>
+        <div class="business-chain">
+          ${scenario.steps
+            .map((item, index) => {
+              const stateText = scenarioStepState(item, index, run);
+              return `
+                <button class="${cls("business-chain-step", stateText === "Done" && "is-done", index === state.activeScenarioStep && "is-active")}" data-cockpit-step="${index}">
+                  <span>${index + 1}</span>
+                  <strong>${t(item.label)}</strong>
+                  <small>${moduleLabel(item.module)} · ${t(stateText)}</small>
+                </button>
+              `;
+            })
+            .join("")}
+        </div>
+        <div class="decision-summary cockpit-decision">
+          <div class="scenario-chain-head">
+            <div>
+              <h3>${t("Decision Summary")}</h3>
+              <p>${t("Decision summary uses fictional metrics and sanitized evidence only.")}</p>
+            </div>
+          </div>
+          <p>${run.decision ? scenarioDecisionText(scenario, progress) : t("No decision summary generated yet.")}</p>
+        </div>
+      </section>
+
+      <aside class="panel cockpit-rail">
+        <div class="panel-head">
+          <div>
+            <h2>${t("Risk command rail")}</h2>
+            <p>${t("Board-level fictional alerts")}</p>
+          </div>
+        </div>
+        <div class="command-rail-list">
+          ${commandCenter
+            .map(
+              (item) => `
+                <article class="${toneClass(item.tone)}">
+                  <span>${t(item.label)}</span>
+                  <strong>${item.value}</strong>
+                  <small>${t(item.meta)}</small>
+                </article>
+              `,
+            )
+            .join("")}
+        </div>
+      </aside>
+    </div>
+
+    <div class="cockpit-grid">
+      <section class="panel battle-snapshot">
+        <div class="panel-head">
+          <div>
+            <h2>${t("Regional Battle Map")}</h2>
+            <p>${t("Highest pressure regions and linked savings actions")}</p>
+          </div>
+          <button class="mini-action" data-nav="costMap">${t("View full cost map")}</button>
+        </div>
+        <div class="battle-mini-grid">
+          ${rankedRegions.slice(0, 6).map((item, index) => `
+            <button class="${cls("battle-mini-row", item.region === state.selectedHeat.region && "is-active")}" data-battle-region="${item.region}" data-battle-category="${item.peak.label}">
+              <span>${index + 1}</span>
+              <strong>${t(item.region)}</strong>
+              <small>${t("Average score")} ${item.average} · ${t(item.peak.label)} ${item.peak.score}</small>
+            </button>
+          `).join("")}
+        </div>
+        <div class="battle-feature">
+          <span>${t("Selected battle region")}</span>
+          <strong>${formatJoin([battleRegion.region, battleRegion.peak.label])}</strong>
+          <small>${t("Top pressure")} ${battleRegion.peak.score} · ${t("Variance")} ${battleRegion.variance}</small>
+        </div>
+      </section>
+
+      <section class="panel savings-panel">
+        <div class="panel-head">
+          <div>
+            <h2>${t("Savings Leaderboard")}</h2>
+            <p>${t("Top actions by synthetic impact")}</p>
+          </div>
+        </div>
+        <div class="savings-list">
+          ${savingsActions.slice(0, 5).map((item, index) => `
+            <button class="${cls(item.action === state.activeCostAction && "is-active")}" data-cost-action="${item.action}">
+              <span>${index + 1}</span>
+              <strong>${t(item.action)}</strong>
+              <small>${item.impact} · ${t(item.scope)} · ${t(item.owner)}</small>
+            </button>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="panel evidence-panel">
+        <div class="panel-head">
+          <div>
+            <h2>${t("AI Evidence Trail")}</h2>
+            <p>${t("Signals surfaced from local browser state only")}</p>
+          </div>
+        </div>
+        <div class="evidence-ticker">
+          ${evidenceTrail.slice(0, 8).map((item) => `
+            <article>
+              <span>${moduleLabel(item.module)}</span>
+              <strong>${t(item.step)}</strong>
+              <small>${maskedEvidence(item.evidence)}</small>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+    </div>
+
     <section class="panel">
       <div class="panel-head">
         <div>
@@ -1031,12 +1287,13 @@ function renderPortal() {
       </div>
       ${renderScenarioCards()}
     </section>
+
     <div class="portal-grid">
       <section class="panel panel-large">
         <div class="panel-head">
           <div>
-            <h2>${t("Operations Portal")}</h2>
-            <p>${portfolio.asOf}</p>
+            <h2>${t("Launch modules")}</h2>
+            <p>${t("Open module workbench")}</p>
           </div>
           <span class="status-chip">${t("Local Preview")}</span>
         </div>
@@ -1483,6 +1740,8 @@ function renderMaterials() {
 function renderCostMap() {
   const heatHeaders = ["Security", "Cleaning", "Landscape", "Elevator", "Repair"];
   const heat = selectedHeatValue();
+  const rankedRegions = rankedCostRegions();
+  const battleRegion = selectedBattleRegion();
   const activeAction =
     costMapActions.find((item) => item.action === state.activeCostAction) || costMapActions[0];
 
@@ -1508,6 +1767,68 @@ function renderCostMap() {
             `,
           )
           .join("")}
+      </div>
+    </section>
+    <section class="panel battle-map-panel">
+      <div class="panel-head">
+        <div>
+          <h2>${t("Regional Battle Map")}</h2>
+          <p>${t("Highest pressure regions and linked savings actions")}</p>
+        </div>
+        <span class="${cls("badge", heatTone(battleRegion.average) === "good" ? "tone-good" : heatTone(battleRegion.average) === "watch" ? "tone-warning" : "tone-danger")}">${t("Average score")} ${battleRegion.average}</span>
+      </div>
+      <div class="battle-map-grid">
+        <div class="battle-ranking-list">
+          <div class="scenario-chain-head">
+            <div>
+              <h3>${t("Regional ranking")}</h3>
+              <p>${t("Top pressure")}</p>
+            </div>
+          </div>
+          ${rankedRegions.map((item, index) => `
+            <button class="${cls("battle-rank-row", item.region === state.selectedHeat.region && "is-active")}" data-battle-region="${item.region}" data-battle-category="${item.peak.label}">
+              <span>${index + 1}</span>
+              <strong>${t(item.region)}</strong>
+              <small>${t("Average score")} ${item.average} · ${t(item.peak.label)} ${item.peak.score}</small>
+            </button>
+          `).join("")}
+        </div>
+        <div class="battle-radar">
+          <div class="battle-feature">
+            <span>${t("Selected battle region")}</span>
+            <strong>${formatJoin([battleRegion.region, battleRegion.peak.label])}</strong>
+            <small>${t("Benchmark")} ${battleRegion.benchmark} · ${t("Variance")} ${battleRegion.variance}</small>
+          </div>
+          <div class="radar-bars">
+            ${costMapCategories.map((category) => `
+              <div class="radar-row">
+                <span>${t(category.label)}</span>
+                ${progressBar(battleRegion[category.key], heatTone(battleRegion[category.key]) === "good" ? "good" : "warning")}
+                <strong>${battleRegion[category.key]}</strong>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+        <div class="battle-evidence-stack">
+          <div class="scenario-chain-head">
+            <div>
+              <h3>${t("Linked evidence trail")}</h3>
+              <p>${t("Action linked")}</p>
+            </div>
+          </div>
+          <article>
+            <span>${t("Suggested Action")}</span>
+            <strong>${t(activeAction.action)}</strong>
+            <small>${activeAction.impact} · ${t("Savings owner")} ${t(activeAction.owner)}</small>
+          </article>
+          ${battleRegion.drivers.map((driver) => `
+            <article>
+              <span>${t("Driver")}</span>
+              <strong>${t(driver)}</strong>
+              <small>${t("No production files attached")}</small>
+            </article>
+          `).join("")}
+        </div>
       </div>
     </section>
     <section class="panel panel-large">
@@ -1906,6 +2227,25 @@ function render() {
 }
 
 function bindPage() {
+  document.querySelectorAll("[data-cockpit-run]").forEach((button) => {
+    button.addEventListener("click", () => {
+      runFullBusinessChain();
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-cockpit-step]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const scenario = scenarioJourneys[0];
+      state.activeScenario = scenario.id;
+      state.activeScenarioStep = Number.parseInt(button.dataset.cockpitStep, 10) || 0;
+      state.scenarioAction = `Step "${activeScenarioStep(scenario).label}" selected.`;
+      state.active = "scenarios";
+      window.location.hash = "scenarios";
+      render();
+    });
+  });
+
   document.querySelectorAll("[data-scenario]").forEach((button) => {
     button.addEventListener("click", () => {
       const scenario = scenarioJourneys.find((item) => item.id === button.dataset.scenario) || scenarioJourneys[0];
@@ -2042,6 +2382,16 @@ function bindPage() {
       state.selectedHeat = {
         region: button.dataset.heatRegion,
         category: button.dataset.heatCategory,
+      };
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-battle-region]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedHeat = {
+        region: button.dataset.battleRegion,
+        category: button.dataset.battleCategory,
       };
       render();
     });

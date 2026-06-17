@@ -1,9 +1,9 @@
 export const modules = [
   {
     id: "portal",
-    label: "Portal",
+    label: "Executive Cockpit",
     short: "PO",
-    summary: "Unified entry and module routing",
+    summary: "Portfolio command cockpit and demo launchpad",
     status: "Ready",
   },
   {

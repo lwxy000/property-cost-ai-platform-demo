@@ -35,6 +35,17 @@ The scenario page now simulates a business run without adding a backend:
 
 This is still a static-hostable demo. The run state lives only in browser memory and is reset by page reload or by the scenario reset control.
 
+## Executive Cockpit
+
+The public first screen is now an executive cockpit instead of a plain module index:
+
+- portfolio KPIs provide the first-view scale signal;
+- the one-click business chain completes the main material-to-risk scenario in local browser state;
+- the risk rail, savings leaderboard and AI evidence trail make the platform breadth visible before a visitor opens any module;
+- the regional battle-map preview links cost pressure rankings to cost-map drilldowns.
+
+The cockpit uses only fictional records already present in the demo model.
+
 ## Safety Boundary
 
 All scenario data is fictional. The scenario flows are recreated for public demonstration and do not copy production database records, uploads, contracts, screenshots, API responses or repository history.
