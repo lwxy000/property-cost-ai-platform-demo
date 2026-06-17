@@ -8,10 +8,13 @@ The demo can be hosted as static files, but the browser experience is interactiv
 
 The interface supports Chinese and English. Chinese is the default language because the operating scenarios are closer to Chinese property/procurement workflows, while English remains available for GitHub portfolio display.
 
+Current focus: this repository is being refined locally from a module showcase into a guided business-scenario demo. It is not ready for public promotion yet.
+
 ## What It Shows
 
 - Portal home for module routing
 - Chinese / English language switch with local browser state
+- Guided business scenarios that connect material import, price library review, cost-map anomaly, contract risk, Smart Q&A and permission masking
 - Portfolio command center with synthetic region, project and risk signals
 - Cost overview with 12-month budget, actual, paid and variance mock data
 - Material price library with reviewer-confirmed rows and AI import candidates
@@ -77,4 +80,5 @@ The first public version is intentionally static-hostable, not interaction-free.
 - [Demo scope](docs/demo-scope.md)
 - [Data sanitization](docs/data-sanitization.md)
 - [Product story](docs/product-story.md)
+- [Business scenarios](docs/business-scenarios.md)
 - [Public release checklist](docs/public-release-checklist.md)

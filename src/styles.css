@@ -257,14 +257,16 @@ input {
 }
 
 .command-grid,
-.action-impact-grid {
+.action-impact-grid,
+.scenario-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
 }
 
 .command-card,
-.action-impact-grid article {
+.action-impact-grid article,
+.scenario-card {
   display: grid;
   gap: 8px;
   min-height: 118px;
@@ -299,6 +301,222 @@ input {
 
 .command-card.tone-danger {
   border-color: rgba(191, 49, 49, 0.3);
+}
+
+.scenario-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.75fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.scenario-hero h2 {
+  margin: 2px 0 8px;
+  font-size: 25px;
+}
+
+.scenario-hero p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.scenario-hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.scenario-hero-metrics article,
+.scenario-detail-card,
+.scenario-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  padding: 12px;
+}
+
+.scenario-hero-metrics article {
+  display: grid;
+  gap: 6px;
+}
+
+.scenario-hero-metrics span,
+.scenario-card p,
+.scenario-card-meta,
+.scenario-detail-card span,
+.scenario-detail-card p,
+.scenario-step small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.scenario-card {
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.scenario-card.is-active {
+  border-color: rgba(12, 122, 123, 0.55);
+  outline: 2px solid rgba(12, 122, 123, 0.16);
+}
+
+.scenario-card h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.scenario-card p {
+  min-height: 42px;
+  margin: 0;
+}
+
+.scenario-card-head,
+.scenario-card-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.scenario-card-head span {
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.scenario-card-head strong {
+  font-size: 20px;
+}
+
+.scenario-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(330px, 0.55fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.scenario-timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.scenario-step {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 4px 10px;
+  min-height: 82px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px;
+  text-align: left;
+}
+
+.scenario-step span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #e7ecef;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.scenario-step strong,
+.scenario-step small {
+  min-width: 0;
+}
+
+.scenario-step small {
+  grid-column: 2;
+}
+
+.scenario-step.is-done span {
+  background: var(--green);
+  color: #fff;
+}
+
+.scenario-step.is-active {
+  border-color: rgba(12, 122, 123, 0.58);
+  background: var(--teal-soft);
+}
+
+.scenario-step.is-active span {
+  background: var(--teal);
+  color: #fff;
+}
+
+.scenario-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.scenario-detail-card {
+  display: grid;
+  gap: 8px;
+}
+
+.scenario-detail-card strong {
+  font-size: 18px;
+}
+
+.scenario-detail-card p {
+  margin: 0;
+}
+
+.scenario-side h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.evidence-list,
+.module-link-row,
+.scenario-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.evidence-list span {
+  border-radius: 7px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  padding: 7px 9px;
+  font-size: 12px;
+}
+
+.module-link-row button,
+.scenario-actions button {
+  min-height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--text);
+  padding: 0 10px;
+}
+
+.module-link-row button.is-active {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+  color: var(--teal);
+  font-weight: 800;
+}
+
+.scenario-actions {
+  display: grid;
+}
+
+.scenario-actions button {
+  text-align: left;
+}
+
+.scenario-actions button:hover {
+  border-color: rgba(12, 122, 123, 0.5);
 }
 
 .panel {
@@ -1037,7 +1255,9 @@ tr:last-child td {
   .portal-grid,
   .two-column,
   .qa-layout,
-  .workbench-grid {
+  .workbench-grid,
+  .scenario-hero,
+  .scenario-workbench {
     grid-template-columns: 1fr;
   }
 
@@ -1130,6 +1350,11 @@ tr:last-child td {
   }
 
   .insight-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-hero-metrics,
+  .scenario-detail-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -10,6 +10,8 @@ The public version is designed for GitHub display. It communicates the product i
 
 The default interface language is Chinese to better reflect the operational context. English is kept as a switchable portfolio-facing layer.
 
+The current local iteration leads with guided business scenarios instead of standalone module browsing. The goal is to show how an operator moves from one business signal to the next.
+
 ## Narrative Flow
 
 1. The portal gives executives and operators a single entry point.

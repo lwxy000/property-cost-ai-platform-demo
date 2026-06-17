@@ -5,6 +5,7 @@ import {
   commandCenter,
   moduleHealth,
   operationsFeed,
+  scenarioJourneys,
   costKpis,
   costTrend,
   costRows,
@@ -25,7 +26,7 @@ import {
 const app = document.querySelector("#app");
 
 const state = {
-  active: "portal",
+  active: "scenarios",
   language: localStorage.getItem("demo-language") || "zh",
   region: "All Regions",
   project: "All Projects",
@@ -43,10 +44,15 @@ const state = {
   qaQuestion: "Can this demo approve an AI-extracted material price automatically?",
   qaResultIndex: 2,
   selectedRole: "HQ Cost Reviewer",
+  activeScenario: scenarioJourneys[0].id,
+  activeScenarioStep: scenarioJourneys[0].currentStep,
+  scenarioAction: "Open a scenario, pick a step, and simulate the next business action.",
 };
 
 const zh = {
   Portal: "门户首页",
+  Scenarios: "业务场景",
+  "Guided workflows from import to decision": "从导入到决策的业务链路演示",
   "Cost Overview": "成本总览",
   "Material Library": "材料库",
   "Cost Map": "成本地图",
@@ -228,7 +234,9 @@ const zh = {
   "Pending final synthetic evidence": "等待最终模拟凭证",
   "Create Task": "创建任务",
   "Request Evidence": "索要资料",
+  "Request evidence": "索要资料",
   "Simulate Approval": "模拟审批",
+  "Simulate approval": "模拟审批",
   "Latest Mock Action": "最近模拟动作",
   "Risk Logic": "风险逻辑",
   "First-stage public demo rules": "公开版首阶段规则",
@@ -268,6 +276,98 @@ const zh = {
   "HQ reviewer validates role and project scope": "总部复核角色与项目范围",
   Activate: "启用",
   "Admin grants demo access": "管理员授予演示权限",
+  "Business Scenario Demo": "业务场景演示",
+  "Guided scenario paths": "业务链路路径",
+  "Module views remain available, but the demo now leads with end-to-end work scenes.": "模块视图仍然保留，但演示现在优先呈现端到端业务场景。",
+  "Start scenario": "进入场景",
+  "Continue scenario": "继续场景",
+  "Scenario command": "场景指令",
+  "Scenario steps": "场景步骤",
+  "Step detail": "步骤详情",
+  "Evidence": "依据",
+  "Mock actions": "模拟动作",
+  "Linked modules": "关联模块",
+  "Scenario metrics": "场景指标",
+  "Current business action": "当前业务动作",
+  "Previous step": "上一步",
+  "Next step": "下一步",
+  "Open linked module": "打开关联模块",
+  "In progress": "进行中",
+  Ready: "就绪",
+  Done: "已完成",
+  Current: "当前",
+  "Material import to contract risk": "材料导入到合同风险",
+  "Quote recognition, price confirmation, benchmark anomaly and payment-risk follow-up.": "报价识别、价格确认、基准异常与付款风险跟进。",
+  "Monthly service payment review": "月度服务付款复核",
+  "Contract ledger, service-period check, missing evidence and approval simulation.": "合同台账、服务期间核验、缺失凭证与审批模拟。",
+  "Vendor access and Q&A boundary": "供应商访问与问答边界",
+  "Role switch, amount masking, scoped material view and safe Q&A response.": "角色切换、金额脱敏、范围化材料视图与安全问答。",
+  "Recognized rows": "识别行数",
+  "New library items": "新增入库项",
+  "Anomaly regions": "异常区域",
+  "Linked contracts": "关联合同",
+  "Payment lag cases": "付款滞后案例",
+  "High risk contracts": "高风险合同",
+  "Due soon": "即将到期",
+  "Evidence gaps": "凭证缺口",
+  "Blocked events": "拦截事件",
+  Roles: "角色",
+  "Masked amount": "脱敏金额",
+  "Q&A rules": "问答规则",
+  "AI import": "AI 导入",
+  "Price library": "价格库",
+  "Cost anomaly": "成本异常",
+  "Contract risk": "合同风险",
+  "Permission masking": "权限脱敏",
+  "Contract filter": "合同筛选",
+  "Payment review": "付款复核",
+  "Policy question": "制度问答",
+  "Role check": "角色检查",
+  "Role switch": "角色切换",
+  "Masked ledger": "脱敏台账",
+  "Scoped material view": "范围化材料视图",
+  "Safe answer": "安全回答",
+  "386 candidate rows recognized from fictional quote files.": "从虚构报价文件中识别 386 条候选记录。",
+  "278 rows entered the mock price library after reviewer confirmation.": "经复核确认后，278 条记录进入模拟价格库。",
+  "Cost map flags repair and security pressure above the synthetic benchmark band.": "成本地图标记维修与安保压力高于模拟基准区间。",
+  "Linked contracts include payment lag, missing evidence and unit-price deviation signals.": "关联合同包含付款滞后、凭证缺失与单价偏差信号。",
+  "Operator asks why this item is prioritized and receives a rule-based mock answer.": "运营人员询问为何优先处理该事项，并获得规则模拟回答。",
+  "Switching to vendor role hides cross-region exposure and contract amount details.": "切换到供应商角色后，跨区域敞口和合同金额细节被隐藏。",
+  "Risk queue filters high-risk monthly service contracts.": "风险队列筛选高风险月度服务合同。",
+  "Detail drawer checks paid progress, service period and missing acceptance evidence.": "详情抽屉检查付款进度、服务期间和缺失验收资料。",
+  "Smart Q&A explains what should be checked before payment approval.": "智能问答说明付款审批前应检查的内容。",
+  "Role matrix confirms operators can review scoped contracts without account admin rights.": "角色矩阵确认运营人员可复核范围内合同，但无账号管理权限。",
+  "External vendor role limits contracts and material library access.": "外部供应商角色限制合同与材料库访问范围。",
+  "Contract exposure is masked for limited users.": "受限用户的合同敞口会被脱敏。",
+  "Vendor can only see limited material context in the mock scenario.": "供应商在模拟场景中只能看到受限材料上下文。",
+  "Smart Q&A refuses cross-region exposure and cites permission rule AC-03.": "智能问答拒绝跨区域敞口查询，并引用权限规则 AC-03。",
+  "Open import center": "打开导入中心",
+  "Confirm candidates": "确认候选项",
+  "Review duplicate prices": "复核重复价格",
+  "Compare supplier band": "对比供应商区间",
+  "Open heat matrix": "打开热力矩阵",
+  "Generate saving action": "生成节降动作",
+  "Ask linked question": "询问关联问题",
+  "Generate answer": "生成回答",
+  "Open contract list": "打开合同清单",
+  "Filter high risk": "筛选高风险",
+  "Ask contract question": "询问合同问题",
+  "Trace evidence": "追踪依据",
+  "Preview operator role": "预览运营角色",
+  "Check permissions": "检查权限",
+  "Preview vendor role": "预览供应商角色",
+  "Check masking": "检查脱敏",
+  "View masked amount": "查看脱敏金额",
+  "Compare reviewer role": "对比复核角色",
+  "Open material library": "打开材料库",
+  "Search scoped item": "搜索范围内条目",
+  "Ask permission question": "询问权限问题",
+  "Role-scoped answer": "角色范围回答",
+  "43% paid": "已付 43%",
+  "High risk": "高风险",
+  "Region C / Repair score 94": "区域 C / 维修分 94",
+  "Region F / Security score 95": "区域 F / 安保分 95",
+  "Open a scenario, pick a step, and simulate the next business action.": "打开一个场景，选择步骤，并模拟下一项业务动作。",
   "No production repository history": "不包含生产仓库历史",
   "No real database connection": "不连接真实数据库",
   "No real uploads or contract files": "不包含真实上传或合同文件",
@@ -500,6 +600,18 @@ function activeModule() {
   return modules.find((module) => module.id === state.active) || modules[0];
 }
 
+function activeScenario() {
+  return scenarioJourneys.find((scenario) => scenario.id === state.activeScenario) || scenarioJourneys[0];
+}
+
+function activeScenarioStep(scenario = activeScenario()) {
+  return scenario.steps[state.activeScenarioStep] || scenario.steps[0];
+}
+
+function moduleLabel(id) {
+  return t(modules.find((module) => module.id === id)?.label || id);
+}
+
 function riskTone(risk) {
   if (risk === "High") return "tone-danger";
   if (risk === "Medium") return "tone-warning";
@@ -655,6 +767,32 @@ function selectedHeatValue() {
   return { row, score: row[key], key };
 }
 
+function renderScenarioCards() {
+  return `
+    <div class="scenario-card-grid">
+      ${scenarioJourneys
+        .map(
+          (scenario) => `
+            <article class="${cls("scenario-card", scenario.id === state.activeScenario && "is-active")}">
+              <div class="scenario-card-head">
+                <span>${t(scenario.status)}</span>
+                <strong>${scenario.impact}</strong>
+              </div>
+              <h3>${t(scenario.title)}</h3>
+              <p>${t(scenario.summary)}</p>
+              <div class="scenario-card-meta">
+                <span>${t("Owner")}: ${t(scenario.owner)}</span>
+                <span>${scenario.steps.length} ${state.language === "zh" ? "步" : "steps"}</span>
+              </div>
+              <button class="primary-action" data-scenario="${scenario.id}">${t(scenario.id === state.activeScenario ? "Continue scenario" : "Start scenario")}</button>
+            </article>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
 function contractActionText() {
   if (state.language === "en") return state.contractAction;
   const contract = state.contractAction.match(/DEMO-CT-\d{4}-\d{3}/)?.[0] || state.selectedContractNo;
@@ -673,6 +811,32 @@ function contractActionText() {
   return "打开风险队列，选择合同，并模拟复核动作。";
 }
 
+function scenarioActionText() {
+  if (state.language === "en") return state.scenarioAction;
+  const scenario = activeScenario();
+  const step = activeScenarioStep(scenario);
+  if (state.scenarioAction.startsWith("Selected")) {
+    return `已切换到「${t(scenario.title)}」业务场景。`;
+  }
+  if (state.scenarioAction.startsWith("Step")) {
+    return `已定位到「${t(step.label)}」步骤。`;
+  }
+  if (state.scenarioAction.startsWith("Action")) {
+    const action = state.scenarioAction.replace(/^Action "/, "").replace(/" simulated\.$/, "");
+    return `已模拟「${t(action)}」动作。`;
+  }
+  if (state.scenarioAction.startsWith("Moved")) {
+    return `已推进到「${t(step.label)}」步骤。`;
+  }
+  return t(state.scenarioAction);
+}
+
+function scenarioTone(stateText) {
+  if (stateText === "Done") return "tone-good";
+  if (stateText === "Current") return "tone-warning";
+  return "tone-neutral";
+}
+
 function renderPortal() {
   return `
     ${kpiCards(portalStats)}
@@ -688,6 +852,16 @@ function renderPortal() {
           `,
         )
         .join("")}
+    </section>
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>${t("Guided scenario paths")}</h2>
+          <p>${t("Module views remain available, but the demo now leads with end-to-end work scenes.")}</p>
+        </div>
+        <button class="primary-action" data-nav="scenarios">${t("Business Scenario Demo")}</button>
+      </div>
+      ${renderScenarioCards()}
     </section>
     <div class="portal-grid">
       <section class="panel panel-large">
@@ -771,6 +945,107 @@ function renderPortal() {
         </div>
         <img src="./public/assets/design-direction.png" alt="Design mockup direction with fictional data" />
       </section>
+    </div>
+  `;
+}
+
+function renderScenarios() {
+  const scenario = activeScenario();
+  const step = activeScenarioStep(scenario);
+  const currentModule = modules.find((module) => module.id === step.module);
+
+  return `
+    <section class="scenario-hero panel">
+      <div>
+        <p class="eyebrow">${t("Scenario command")}</p>
+        <h2>${t("Business Scenario Demo")}</h2>
+        <p>${t("Module views remain available, but the demo now leads with end-to-end work scenes.")}</p>
+      </div>
+      <div class="scenario-hero-metrics">
+        ${scenario.metrics
+          .map(
+            (metric) => `
+              <article>
+                <span>${t(metric.label)}</span>
+                <strong>${metric.value}</strong>
+              </article>
+            `,
+          )
+          .join("")}
+      </div>
+    </section>
+    ${renderScenarioCards()}
+    <div class="scenario-workbench">
+      <section class="panel panel-large">
+        <div class="panel-head">
+          <div>
+            <h2>${t(scenario.title)}</h2>
+            <p>${t(scenario.summary)}</p>
+          </div>
+          <span class="${cls("badge", scenario.status === "In progress" ? "tone-warning" : "tone-good")}">${t(scenario.status)}</span>
+        </div>
+        <div class="scenario-timeline">
+          ${scenario.steps
+            .map(
+              (item, index) => `
+                <button class="${cls("scenario-step", index === state.activeScenarioStep && "is-active", item.state === "Done" && "is-done")}" data-scenario-step="${index}">
+                  <span>${index + 1}</span>
+                  <strong>${t(item.label)}</strong>
+                  <small>${t(item.state)} · ${t(item.time)}</small>
+                </button>
+              `,
+            )
+            .join("")}
+        </div>
+        <div class="scenario-detail-grid">
+          <article class="scenario-detail-card">
+            <span>${t("Step detail")}</span>
+            <strong>${t(step.label)}</strong>
+            <p>${t(step.result)}</p>
+          </article>
+          <article class="scenario-detail-card">
+            <span>${t("Linked modules")}</span>
+            <strong>${moduleLabel(step.module)}</strong>
+            <p>${currentModule ? t(currentModule.summary) : ""}</p>
+            <button class="mini-action" data-scenario-module="${step.module}">${t("Open linked module")}</button>
+          </article>
+        </div>
+      </section>
+      <aside class="panel detail-panel scenario-side">
+        <div class="panel-head">
+          <div>
+            <h2>${t("Evidence")}</h2>
+            <p>${t("Mock Data")}</p>
+          </div>
+          <span class="${cls("badge", scenarioTone(step.state))}">${t(step.state)}</span>
+        </div>
+        <div class="evidence-list">
+          ${step.evidence.map((item) => `<span>${t(item)}</span>`).join("")}
+        </div>
+        <div class="module-link-row">
+          ${scenario.modules
+            .map(
+              (moduleId) => `
+                <button class="${moduleId === step.module ? "is-active" : ""}" data-scenario-module="${moduleId}">
+                  ${moduleLabel(moduleId)}
+                </button>
+              `,
+            )
+            .join("")}
+        </div>
+        <div class="scenario-actions">
+          <h3>${t("Mock actions")}</h3>
+          ${step.actions.map((action) => `<button data-scenario-action="${action}">${t(action)}</button>`).join("")}
+        </div>
+        <div class="inline-actions">
+          <button data-scenario-prev>${t("Previous step")}</button>
+          <button class="primary-action" data-scenario-next>${t("Next step")}</button>
+        </div>
+        <div class="action-result">
+          <strong>${t("Current business action")}</strong>
+          <span>${scenarioActionText()}</span>
+        </div>
+      </aside>
     </div>
   `;
 }
@@ -1364,6 +1639,7 @@ function renderTable(headers, rows) {
 function render() {
   const views = {
     portal: renderPortal,
+    scenarios: renderScenarios,
     cost: renderCost,
     materials: renderMaterials,
     costMap: renderCostMap,
@@ -1377,6 +1653,58 @@ function render() {
 }
 
 function bindPage() {
+  document.querySelectorAll("[data-scenario]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const scenario = scenarioJourneys.find((item) => item.id === button.dataset.scenario) || scenarioJourneys[0];
+      state.activeScenario = scenario.id;
+      state.activeScenarioStep = scenario.currentStep || 0;
+      state.scenarioAction = `Selected "${scenario.title}" scenario.`;
+      state.active = "scenarios";
+      window.location.hash = "scenarios";
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-scenario-step]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.activeScenarioStep = Number.parseInt(button.dataset.scenarioStep, 10) || 0;
+      const step = activeScenarioStep();
+      state.scenarioAction = `Step "${step.label}" selected.`;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-scenario-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.scenarioAction = `Action "${button.dataset.scenarioAction}" simulated.`;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-scenario-next]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const scenario = activeScenario();
+      state.activeScenarioStep = Math.min(state.activeScenarioStep + 1, scenario.steps.length - 1);
+      state.scenarioAction = `Moved to "${activeScenarioStep(scenario).label}".`;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-scenario-prev]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const scenario = activeScenario();
+      state.activeScenarioStep = Math.max(state.activeScenarioStep - 1, 0);
+      state.scenarioAction = `Moved to "${activeScenarioStep(scenario).label}".`;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-scenario-module]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setActive(button.dataset.scenarioModule);
+    });
+  });
+
   document.querySelectorAll("[data-lang]").forEach((button) => {
     button.addEventListener("click", () => {
       state.language = button.dataset.lang;
