@@ -2,11 +2,10 @@
   "name": "property-cost-ai-platform-demo",
   "version": "0.1.0",
   "private": true,
-  "description": "A sanitized static demo for an AI-enabled property operations platform.",
+  "description": "A sanitized interactive front-end mock for an AI-enabled property operations platform.",
   "type": "module",
   "scripts": {
     "dev": "python -m http.server 4173",
     "check": "node --check src/app.js && node --check src/data.js"
   }
 }
-

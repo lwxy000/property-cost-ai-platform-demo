@@ -4,9 +4,10 @@ This demo presents product capability, not production implementation.
 
 ## Included
 
-- Static UI shell
+- Static-hosted interactive UI shell
 - Mock data stored in JavaScript files
 - Fictional operating scenarios
+- Local browser-state workflows for filtering, review, confirmation and Q&A matching
 - Local-only preview
 - Sanitized README and documentation
 
@@ -21,5 +22,4 @@ This demo presents product capability, not production implementation.
 
 ## First Deliverable
 
-The first deliverable is a local static preview that can be reviewed safely before any public GitHub repository is created.
-
+The first deliverable is a local interactive front-end preview that can be reviewed safely before any public GitHub repository is created.

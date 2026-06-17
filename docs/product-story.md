@@ -1,6 +1,6 @@
 # Product Story
 
-This demo presents a sanitized operating platform for property, procurement, cost, contract, material and AI-assisted workflows.
+This demo presents a sanitized interactive front-end mock for property, procurement, cost, contract, material and AI-assisted workflows.
 
 ## Positioning
 
@@ -20,7 +20,7 @@ The public version is designed for GitHub display. It communicates the product i
 
 ## What The Demo Proves
 
-- A static front end can still communicate a complex operational platform.
+- A static-hosted front end can still communicate a complex operational platform through local browser interactions.
 - Rich mock data makes the product easier to understand without using real data.
 - AI import, recognition and Q&A can be explained safely as review workflows.
 - Public packaging can be kept separate from production implementation and history.
@@ -28,4 +28,3 @@ The public version is designed for GitHub display. It communicates the product i
 ## Deliberate Limits
 
 This demo does not connect to a database, call a production API, upload files, parse real contracts, expose real prices or include real permissions. Any future hosted version should pass the public release checklist first.
-

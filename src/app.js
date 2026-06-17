@@ -29,8 +29,19 @@ const state = {
   region: "All Regions",
   project: "All Projects",
   materialQuery: "",
+  materialStep: 1,
+  selectedCandidate: materialCandidates[0].extracted,
+  confirmedCandidates: new Set(),
+  selectedHeat: { region: "Region F", category: "Repair" },
+  activeCostAction: costMapActions[0].action,
+  contractSearch: "",
   contractRisk: "All",
+  selectedContractNo: contracts[0].no,
+  contractAction: "Open the risk queue, select a contract, and simulate a review action.",
   qaMode: "Local match",
+  qaQuestion: "Can this demo approve an AI-extracted material price automatically?",
+  qaResultIndex: 2,
+  selectedRole: "HQ Cost Reviewer",
 };
 
 function cls(...parts) {
@@ -43,6 +54,26 @@ function toneClass(tone) {
 
 function activeModule() {
   return modules.find((module) => module.id === state.active) || modules[0];
+}
+
+function riskTone(risk) {
+  if (risk === "High") return "tone-danger";
+  if (risk === "Medium") return "tone-warning";
+  return "tone-good";
+}
+
+function percentValue(value) {
+  return Number.parseInt(String(value).replace("%", ""), 10) || 0;
+}
+
+function scopeRows(rows, areaKey = "area", projectKey = "project") {
+  return rows.filter((row) => {
+    const rowRegion = row[areaKey] || row.city;
+    const rowProject = row[projectKey];
+    const regionOk = state.region === "All Regions" || !rowRegion || rowRegion === state.region;
+    const projectOk = state.project === "All Projects" || !rowProject || rowProject === state.project;
+    return regionOk && projectOk;
+  });
 }
 
 function setActive(id) {
@@ -84,7 +115,7 @@ function renderShell(content) {
         </nav>
         <div class="safety-box">
           <strong>Demo Boundary</strong>
-          <span>Static mock only</span>
+          <span>Front-end mock only</span>
           <span>No database</span>
           <span>No secrets</span>
         </div>
@@ -161,6 +192,19 @@ function heatTone(score) {
   if (score >= 80) return "high";
   if (score >= 65) return "watch";
   return "good";
+}
+
+function selectedHeatValue() {
+  const keyMap = {
+    Security: "security",
+    Cleaning: "cleaning",
+    Landscape: "landscape",
+    Elevator: "elevator",
+    Repair: "repair",
+  };
+  const row = costMapMatrix.find((item) => item.region === state.selectedHeat.region) || costMapMatrix[0];
+  const key = keyMap[state.selectedHeat.category] || "repair";
+  return { row, score: row[key], key };
 }
 
 function renderPortal() {
@@ -259,7 +303,7 @@ function renderPortal() {
             <p>IMAGE-2 visual advisor output</p>
           </div>
         </div>
-        <img src="./public/assets/design-direction.png" alt="Static mockup design direction with fictional data" />
+        <img src="./public/assets/design-direction.png" alt="Design mockup direction with fictional data" />
       </section>
     </div>
   `;
@@ -267,6 +311,8 @@ function renderPortal() {
 
 function renderCost() {
   const max = Math.max(...costTrend.flatMap((row) => [row.budget, row.actual, row.paid]));
+  const scopedRows = scopeRows(costRows);
+  const activeAction = state.activeCostAction;
 
   return `
     ${kpiCards(costKpis)}
@@ -310,9 +356,23 @@ function renderCost() {
           </div>
         </div>
         <div class="action-list">
-          <button>Review high variance subjects</button>
-          <button>Compare monthly service cost map</button>
-          <button>Export synthetic executive snapshot</button>
+          ${[
+            "Review high variance subjects",
+            "Compare monthly service cost map",
+            "Export synthetic executive snapshot",
+          ]
+            .map(
+              (action) => `
+                <button class="${activeAction === action ? "is-active" : ""}" data-cost-action="${action}">
+                  ${action}
+                </button>
+              `,
+            )
+            .join("")}
+        </div>
+        <div class="action-result">
+          <strong>${activeAction}</strong>
+          <span>${scopedRows.length} scoped rows ready for mock review.</span>
         </div>
       </section>
     </div>
@@ -325,7 +385,7 @@ function renderCost() {
       </div>
       ${renderTable(
         ["Area", "Project", "Subject", "Budget", "Actual", "Variance", "Owner"],
-        costRows.map((row) => [
+        scopedRows.map((row) => [
           row.area,
           row.project,
           row.subject,
@@ -340,10 +400,13 @@ function renderCost() {
 }
 
 function renderMaterials() {
-  const rows = materials.filter((item) => {
+  const rows = scopeRows(materials, "city", "project").filter((item) => {
     const query = state.materialQuery.trim().toLowerCase();
     return !query || `${item.name} ${item.category} ${item.supplier}`.toLowerCase().includes(query);
   });
+  const selectedCandidate =
+    materialCandidates.find((item) => item.extracted === state.selectedCandidate) || materialCandidates[0];
+  const steps = ["Upload", "Recognize", "Review", "Confirm"];
 
   return `
     <div class="two-column">
@@ -377,24 +440,47 @@ function renderMaterials() {
             <p>Candidate generation, edit and confirm</p>
           </div>
         </div>
-        <ol class="step-list">
-          <li><strong>Upload</strong><span>Mock Excel file selected</span></li>
-          <li><strong>Recognize</strong><span>Static demo simulates extracted rows</span></li>
-          <li><strong>Review</strong><span>Human reviewer edits candidates</span></li>
-          <li><strong>Confirm</strong><span>Only confirmed rows enter library</span></li>
+        <ol class="step-list interactive-steps">
+          ${steps
+            .map(
+              (step, index) => `
+                <li class="${index + 1 <= state.materialStep ? "is-complete" : ""}">
+                  <strong>${step}</strong>
+                  <span>${index + 1 === state.materialStep ? "Current mock step" : index + 1 < state.materialStep ? "Completed in browser state" : "Pending"}</span>
+                </li>
+              `,
+            )
+            .join("")}
         </ol>
+        <div class="inline-actions">
+          <button data-material-step="reset">Reset</button>
+          <button class="primary-action" data-material-step="next">${state.materialStep >= 4 ? "Run Again" : "Advance Step"}</button>
+        </div>
+        <div class="detail-card">
+          <span>Selected Candidate</span>
+          <strong>${selectedCandidate.extracted}</strong>
+          <small>${selectedCandidate.source} - ${selectedCandidate.confidence} confidence</small>
+        </div>
       </section>
     </div>
     <section class="panel">
       <div class="panel-head">
         <div>
           <h2>Recognition Candidates</h2>
-          <p>No external model is called in this static demo</p>
+          <p>No external model is called in this browser-only demo</p>
         </div>
       </div>
       ${renderTable(
-        ["Source File", "Extracted Item", "Confidence", "Reviewer Action"],
-        materialCandidates.map((item) => [item.source, item.extracted, item.confidence, item.action]),
+        ["Source File", "Extracted Item", "Confidence", "Reviewer Action", "State"],
+        materialCandidates.map((item) => [
+          item.source,
+          `<button class="link-button" data-candidate="${item.extracted}">${item.extracted}</button>`,
+          item.confidence,
+          item.action,
+          state.confirmedCandidates.has(item.extracted)
+            ? `<span class="badge tone-good">Confirmed</span>`
+            : `<button class="mini-action" data-confirm-candidate="${item.extracted}">Confirm</button>`,
+        ]),
       )}
     </section>
   `;
@@ -402,6 +488,9 @@ function renderMaterials() {
 
 function renderCostMap() {
   const heatHeaders = ["Security", "Cleaning", "Landscape", "Elevator", "Repair"];
+  const heat = selectedHeatValue();
+  const activeAction =
+    costMapActions.find((item) => item.action === state.activeCostAction) || costMapActions[0];
 
   return `
     <section class="panel cost-command-panel">
@@ -417,10 +506,10 @@ function renderCostMap() {
           .slice(0, 4)
           .map(
             (item) => `
-              <article>
+              <article class="${item.action === state.activeCostAction ? "is-active" : ""}">
                 <span>${item.action}</span>
                 <strong>${item.impact}</strong>
-                <small>${item.scope} · ${item.owner}</small>
+                <small>${item.scope} - ${item.owner}</small>
               </article>
             `,
           )
@@ -444,15 +533,27 @@ function renderCostMap() {
             (row) => `
               <div class="heat-row" role="row">
                 <strong role="rowheader">${row.region}</strong>
-                <span class="heat-cell heat-${heatTone(row.security)}">${row.security}</span>
-                <span class="heat-cell heat-${heatTone(row.cleaning)}">${row.cleaning}</span>
-                <span class="heat-cell heat-${heatTone(row.landscape)}">${row.landscape}</span>
-                <span class="heat-cell heat-${heatTone(row.elevator)}">${row.elevator}</span>
-                <span class="heat-cell heat-${heatTone(row.repair)}">${row.repair}</span>
+                <button class="${cls("heat-cell", `heat-${heatTone(row.security)}`, state.selectedHeat.region === row.region && state.selectedHeat.category === "Security" && "is-active")}" data-heat-region="${row.region}" data-heat-category="Security">${row.security}</button>
+                <button class="${cls("heat-cell", `heat-${heatTone(row.cleaning)}`, state.selectedHeat.region === row.region && state.selectedHeat.category === "Cleaning" && "is-active")}" data-heat-region="${row.region}" data-heat-category="Cleaning">${row.cleaning}</button>
+                <button class="${cls("heat-cell", `heat-${heatTone(row.landscape)}`, state.selectedHeat.region === row.region && state.selectedHeat.category === "Landscape" && "is-active")}" data-heat-region="${row.region}" data-heat-category="Landscape">${row.landscape}</button>
+                <button class="${cls("heat-cell", `heat-${heatTone(row.elevator)}`, state.selectedHeat.region === row.region && state.selectedHeat.category === "Elevator" && "is-active")}" data-heat-region="${row.region}" data-heat-category="Elevator">${row.elevator}</button>
+                <button class="${cls("heat-cell", `heat-${heatTone(row.repair)}`, state.selectedHeat.region === row.region && state.selectedHeat.category === "Repair" && "is-active")}" data-heat-region="${row.region}" data-heat-category="Repair">${row.repair}</button>
               </div>
             `,
           )
           .join("")}
+      </div>
+      <div class="insight-strip">
+        <article>
+          <span>Selected Signal</span>
+          <strong>${state.selectedHeat.region} / ${state.selectedHeat.category}</strong>
+          <small>Pressure score ${heat.score}, priority ${heatTone(heat.score)}</small>
+        </article>
+        <article>
+          <span>Suggested Action</span>
+          <strong>${activeAction.action}</strong>
+          <small>${activeAction.impact} estimated impact, owner ${activeAction.owner}</small>
+        </article>
       </div>
     </section>
     <div class="region-grid">
@@ -506,43 +607,103 @@ function renderCostMap() {
       </div>
       ${renderTable(
         ["Action", "Estimated Impact", "Scope", "Owner"],
-        costMapActions.map((item) => [item.action, item.impact, item.scope, item.owner]),
+        costMapActions.map((item) => [
+          `<button class="link-button" data-cost-action="${item.action}">${item.action}</button>`,
+          item.impact,
+          item.scope,
+          item.owner,
+        ]),
       )}
     </section>
   `;
 }
 
 function renderContracts() {
-  const rows = contracts.filter((item) => state.contractRisk === "All" || item.risk === state.contractRisk);
+  const rows = contracts.filter((item) => {
+    const riskOk = state.contractRisk === "All" || item.risk === state.contractRisk;
+    const projectOk = state.project === "All Projects" || item.project === state.project;
+    const query = state.contractSearch.trim().toLowerCase();
+    const queryOk =
+      !query ||
+      `${item.no} ${item.project} ${item.vendor} ${item.category} ${item.reason}`.toLowerCase().includes(query);
+    return riskOk && projectOk && queryOk;
+  });
+  const selected =
+    rows.find((item) => item.no === state.selectedContractNo) ||
+    contracts.find((item) => item.no === state.selectedContractNo) ||
+    rows[0] ||
+    contracts[0];
+  const paid = percentValue(selected.paid);
 
   return `
     ${kpiCards(contractKpis)}
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <h2>Payment Progress Exposure</h2>
-          <p>Monthly services and cumulative contracts use mock tracking logic</p>
+    <div class="workbench-grid">
+      <section class="panel panel-large">
+        <div class="panel-head">
+          <div>
+            <h2>Payment Progress Exposure</h2>
+            <p>${rows.length} mock contracts in current view</p>
+          </div>
+          <div class="segmented" role="group" aria-label="Risk filter">
+            ${["All", "High", "Medium", "Low"]
+              .map((risk) => `<button class="${state.contractRisk === risk ? "is-active" : ""}" data-risk="${risk}">${risk}</button>`)
+              .join("")}
+          </div>
         </div>
-        <div class="segmented" role="group" aria-label="Risk filter">
-          ${["All", "High", "Medium", "Low"]
-            .map((risk) => `<button class="${state.contractRisk === risk ? "is-active" : ""}" data-risk="${risk}">${risk}</button>`)
-            .join("")}
+        <input id="contractSearch" class="search-input full-width" value="${state.contractSearch}" placeholder="Search contract, vendor or reason" />
+        ${renderTable(
+          ["Contract", "Project", "Vendor", "Category", "Amount", "Paid", "Risk", "Reason"],
+          rows.map((item) => [
+            `<button class="link-button" data-contract="${item.no}">${item.no}</button>`,
+            item.project,
+            item.vendor,
+            item.category,
+            item.amount,
+            item.paid,
+            `<span class="${cls("badge", riskTone(item.risk))}">${item.risk}</span>`,
+            item.reason,
+          ]),
+        )}
+      </section>
+      <aside class="panel detail-panel">
+        <div class="panel-head">
+          <div>
+            <h2>Contract Detail</h2>
+            <p>Click a row to update this mock drawer</p>
+          </div>
+          <span class="${cls("badge", riskTone(selected.risk))}">${selected.risk}</span>
         </div>
-      </div>
-      ${renderTable(
-        ["Contract", "Project", "Vendor", "Category", "Amount", "Paid", "Risk", "Reason"],
-        rows.map((item) => [
-          item.no,
-          item.project,
-          item.vendor,
-          item.category,
-          item.amount,
-          item.paid,
-          `<span class="${cls("badge", item.risk === "High" ? "tone-danger" : item.risk === "Medium" ? "tone-warning" : "tone-good")}">${item.risk}</span>`,
-          item.reason,
-        ]),
-      )}
-    </section>
+        <div class="detail-card">
+          <span>${selected.no}</span>
+          <strong>${selected.project}</strong>
+          <small>${selected.vendor} - ${selected.category}</small>
+        </div>
+        <div class="metric-line">
+          <span>Amount</span>
+          <strong>${selected.amount}</strong>
+        </div>
+        <div class="metric-line">
+          <span>Paid Progress</span>
+          <strong>${selected.paid}</strong>
+        </div>
+        ${progressBar(paid, selected.risk === "High" ? "warning" : "good")}
+        <ol class="timeline">
+          <li class="is-done"><strong>Signed</strong><span>Mock contract ledger created</span></li>
+          <li class="is-done"><strong>Service Period</strong><span>Monthly service tracking active</span></li>
+          <li class="${paid >= 70 ? "is-done" : "is-current"}"><strong>Payment Review</strong><span>${selected.reason}</span></li>
+          <li><strong>Closeout</strong><span>Pending final synthetic evidence</span></li>
+        </ol>
+        <div class="inline-actions">
+          <button data-contract-action="Create review task">Create Task</button>
+          <button data-contract-action="Request evidence">Request Evidence</button>
+          <button class="primary-action" data-contract-action="Simulate approval">Simulate Approval</button>
+        </div>
+        <div class="action-result">
+          <strong>Latest Mock Action</strong>
+          <span>${state.contractAction}</span>
+        </div>
+      </aside>
+    </div>
     <div class="two-column">
       <section class="panel">
         <div class="panel-head">
@@ -575,7 +736,7 @@ function renderContracts() {
 }
 
 function renderSmartQA() {
-  const currentCase = qaCases[state.qaMode === "Vision extract" ? 1 : state.qaMode === "Deep answer" ? 2 : 0];
+  const currentCase = qaCases[state.qaResultIndex] || qaCases[0];
 
   return `
     <div class="qa-layout">
@@ -592,15 +753,15 @@ function renderSmartQA() {
           </div>
         </div>
         <div class="chat-panel">
-          <div class="chat user">Can this demo approve an AI-extracted material price automatically?</div>
+          <div class="chat user">${state.qaQuestion}</div>
           <div class="chat system">
             <strong>${currentCase.answer}</strong>
             <span>${currentCase.evidence}</span>
           </div>
         </div>
         <div class="input-row">
-          <input value="${currentCase.question}" aria-label="Mock question" />
-          <button data-qa-mode="Local match">Get Answer</button>
+          <input id="qaInput" value="${state.qaQuestion}" aria-label="Mock question" />
+          <button id="qaAsk">Get Answer</button>
         </div>
       </section>
       <section class="panel">
@@ -618,6 +779,7 @@ function renderSmartQA() {
                   <span>${item.flow}</span>
                   <strong>${item.question}</strong>
                   <small>${item.evidence}</small>
+                  <button class="mini-action" data-qa-case="${qaCases.indexOf(item)}">Use Case</button>
                 </article>
               `,
             )
@@ -645,19 +807,51 @@ function renderSmartQA() {
 }
 
 function renderAccounts() {
+  const selectedRole = roles.find((item) => item.role === state.selectedRole) || roles[1];
+
   return `
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <h2>Role Matrix</h2>
-          <p>Back-end permission checks are represented as demo rules</p>
+    <div class="workbench-grid">
+      <section class="panel panel-large">
+        <div class="panel-head">
+          <div>
+            <h2>Role Matrix</h2>
+            <p>Select a role to preview masked access</p>
+          </div>
         </div>
-      </div>
-      ${renderTable(
-        ["Role", "Cost", "Materials", "Contracts", "Smart Q&A", "Accounts"],
-        roles.map((item) => [item.role, item.cost, item.materials, item.contracts, item.qa, item.account]),
-      )}
-    </section>
+        ${renderTable(
+          ["Role", "Cost", "Materials", "Contracts", "Smart Q&A", "Accounts"],
+          roles.map((item) => [
+            `<button class="link-button" data-role="${item.role}">${item.role}</button>`,
+            item.cost,
+            item.materials,
+            item.contracts,
+            item.qa,
+            item.account,
+          ]),
+        )}
+      </section>
+      <aside class="panel detail-panel">
+        <div class="panel-head">
+          <div>
+            <h2>Permission Preview</h2>
+            <p>Current selected demo role</p>
+          </div>
+          <span class="status-chip">${selectedRole.role}</span>
+        </div>
+        <div class="permission-preview">
+          <article><span>Cost</span><strong>${selectedRole.cost}</strong></article>
+          <article><span>Materials</span><strong>${selectedRole.materials}</strong></article>
+          <article><span>Contracts</span><strong>${selectedRole.contracts}</strong></article>
+          <article><span>Smart Q&A</span><strong>${selectedRole.qa}</strong></article>
+          <article><span>Accounts</span><strong>${selectedRole.account}</strong></article>
+        </div>
+        <div class="mask-demo">
+          <span>Contract Amount</span>
+          <strong>${selectedRole.contracts === "Limited" || selectedRole.contracts === "None" ? "$***,***" : "$96.8M"}</strong>
+          <small>${selectedRole.contracts === "Limited" || selectedRole.contracts === "None" ? "Masked by selected role" : "Visible in demo role"}</small>
+        </div>
+      </aside>
+    </div>
     <div class="two-column">
       <section class="panel">
         <div class="panel-head">
@@ -671,19 +865,6 @@ function renderAccounts() {
           <li><strong>Review</strong><span>HQ reviewer validates role and project scope</span></li>
           <li><strong>Activate</strong><span>Admin grants demo access</span></li>
         </ol>
-      </section>
-      <section class="panel">
-        <div class="panel-head">
-          <div>
-            <h2>Visitor Masking</h2>
-            <p>Numbers and sensitive details can be hidden by role</p>
-          </div>
-        </div>
-        <div class="mask-demo">
-          <span>Contract Amount</span>
-          <strong>$***,***</strong>
-          <small>Displayed to limited users</small>
-        </div>
       </section>
     </div>
   `;
@@ -720,6 +901,51 @@ function render() {
 }
 
 function bindPage() {
+  document.querySelectorAll("[data-cost-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.activeCostAction = button.dataset.costAction;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-material-step]").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (button.dataset.materialStep === "reset") {
+        state.materialStep = 1;
+        state.confirmedCandidates = new Set();
+      } else {
+        state.materialStep = state.materialStep >= 4 ? 1 : state.materialStep + 1;
+      }
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-candidate]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedCandidate = button.dataset.candidate;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-confirm-candidate]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedCandidate = button.dataset.confirmCandidate;
+      state.materialStep = 4;
+      state.confirmedCandidates.add(button.dataset.confirmCandidate);
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-heat-region]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedHeat = {
+        region: button.dataset.heatRegion,
+        category: button.dataset.heatCategory,
+      };
+      render();
+    });
+  });
+
   document.querySelectorAll("[data-risk]").forEach((button) => {
     button.addEventListener("click", () => {
       state.contractRisk = button.dataset.risk;
@@ -727,9 +953,43 @@ function bindPage() {
     });
   });
 
+  document.querySelectorAll("[data-contract]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedContractNo = button.dataset.contract;
+      state.contractAction = `Selected ${button.dataset.contract} for mock review.`;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-contract-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const contract = contracts.find((item) => item.no === state.selectedContractNo) || contracts[0];
+      state.contractAction = `${button.dataset.contractAction} recorded for ${contract.no}.`;
+      render();
+    });
+  });
+
   document.querySelectorAll("[data-qa-mode]").forEach((button) => {
     button.addEventListener("click", () => {
       state.qaMode = button.dataset.qaMode;
+      state.qaResultIndex =
+        state.qaMode === "Vision extract" ? 1 : state.qaMode === "Deep answer" ? 2 : state.qaResultIndex;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-qa-case]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number.parseInt(button.dataset.qaCase, 10);
+      state.qaResultIndex = Number.isNaN(index) ? 0 : index;
+      state.qaQuestion = qaCases[state.qaResultIndex].question;
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-role]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedRole = button.dataset.role;
       render();
     });
   });
@@ -742,6 +1002,42 @@ function bindPage() {
     });
     materialSearch.focus();
     materialSearch.setSelectionRange(materialSearch.value.length, materialSearch.value.length);
+  }
+
+  const contractSearch = document.querySelector("#contractSearch");
+  if (contractSearch) {
+    contractSearch.addEventListener("input", (event) => {
+      state.contractSearch = event.target.value;
+      render();
+    });
+    contractSearch.focus();
+    contractSearch.setSelectionRange(contractSearch.value.length, contractSearch.value.length);
+  }
+
+  const qaInput = document.querySelector("#qaInput");
+  if (qaInput) {
+    qaInput.addEventListener("input", (event) => {
+      state.qaQuestion = event.target.value;
+    });
+  }
+
+  const qaAsk = document.querySelector("#qaAsk");
+  if (qaAsk) {
+    qaAsk.addEventListener("click", () => {
+      const text = state.qaQuestion.toLowerCase();
+      if (text.includes("material") || text.includes("price") || text.includes("import")) {
+        state.qaResultIndex = 2;
+      } else if (text.includes("contract") || text.includes("payment")) {
+        state.qaResultIndex = 1;
+      } else if (text.includes("cost") || text.includes("region") || text.includes("repair")) {
+        state.qaResultIndex = 3;
+      } else if (text.includes("vendor") || text.includes("role") || text.includes("permission")) {
+        state.qaResultIndex = 4;
+      } else {
+        state.qaResultIndex = 0;
+      }
+      render();
+    });
   }
 }
 

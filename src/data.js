@@ -60,6 +60,10 @@ export const portfolio = {
     "Region E",
     "Region F",
     "Region G",
+    "Region H",
+    "Region I",
+    "Region J",
+    "Region K",
   ],
   projects: [
     "All Projects",
@@ -647,7 +651,7 @@ export const qaCases = [
 export const qaAudit = [
   { type: "Local match", state: "Completed", note: "No external model call" },
   { type: "Vision extract", state: "Mock only", note: "Synthetic document preview" },
-  { type: "Deep answer", state: "Optional", note: "Disabled in static demo" },
+  { type: "Deep answer", state: "Optional", note: "Disabled in browser-only demo" },
   { type: "Permission check", state: "Completed", note: "Role-scoped mock answer" },
   { type: "Evidence trace", state: "Completed", note: "Links to fictional rule groups only" },
 ];

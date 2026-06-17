@@ -373,10 +373,21 @@ input {
 }
 
 .two-column,
-.qa-layout {
+.qa-layout,
+.workbench-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(300px, 0.5fr);
   gap: 16px;
+}
+
+.workbench-grid {
+  align-items: start;
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.45fr);
+}
+
+.detail-panel {
+  position: sticky;
+  top: 16px;
 }
 
 .region-grid {
@@ -572,9 +583,47 @@ tr:last-child td {
   text-align: left;
 }
 
+.action-list button.is-active {
+  border-color: rgba(12, 122, 123, 0.45);
+  background: var(--teal-soft);
+  color: var(--teal);
+  font-weight: 700;
+}
+
 .step-list li {
   display: grid;
   gap: 4px;
+}
+
+.interactive-steps {
+  counter-reset: step;
+}
+
+.interactive-steps li {
+  position: relative;
+  padding-left: 42px;
+}
+
+.interactive-steps li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 12px;
+  top: 13px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #e7ecef;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.interactive-steps li.is-complete::before {
+  background: var(--teal);
+  color: #fff;
 }
 
 .step-list span {
@@ -601,6 +650,138 @@ tr:last-child td {
   font-size: 13px;
 }
 
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.inline-actions button,
+.mini-action,
+.link-button {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.inline-actions button {
+  min-height: 34px;
+  padding: 0 12px;
+}
+
+.inline-actions .primary-action,
+.primary-action {
+  border-color: var(--teal);
+  background: var(--teal);
+  color: #fff;
+}
+
+.mini-action,
+.link-button {
+  min-height: 28px;
+  padding: 2px 8px;
+}
+
+.link-button {
+  border-color: transparent;
+  background: transparent;
+  padding-left: 0;
+  text-align: left;
+}
+
+.link-button:hover,
+.mini-action:hover {
+  text-decoration: underline;
+}
+
+.detail-card,
+.action-result,
+.insight-strip article,
+.permission-preview article {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  padding: 12px;
+}
+
+.detail-card,
+.action-result {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.detail-card span,
+.action-result span,
+.detail-card small,
+.insight-strip small,
+.permission-preview span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.detail-card strong {
+  font-size: 19px;
+}
+
+.action-result strong {
+  font-size: 14px;
+}
+
+.insight-strip,
+.permission-preview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.permission-preview {
+  grid-template-columns: 1fr;
+}
+
+.insight-strip article,
+.permission-preview article {
+  display: grid;
+  gap: 6px;
+}
+
+.timeline {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline li {
+  display: grid;
+  gap: 4px;
+  border-left: 3px solid var(--line);
+  padding-left: 12px;
+}
+
+.timeline li.is-done {
+  border-color: var(--green);
+}
+
+.timeline li.is-current {
+  border-color: var(--amber);
+}
+
+.timeline span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
 .cost-command-panel {
   background: linear-gradient(180deg, #ffffff 0%, #f7fbfb 100%);
 }
@@ -619,7 +800,8 @@ tr:last-child td {
 }
 
 .heat-row > span,
-.heat-row > strong {
+.heat-row > strong,
+.heat-row > button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -643,8 +825,15 @@ tr:last-child td {
 }
 
 .heat-cell {
+  border: 0;
   color: #17212b;
   font-weight: 800;
+}
+
+.heat-cell.is-active,
+.action-impact-grid article.is-active {
+  outline: 2px solid rgba(12, 122, 123, 0.65);
+  outline-offset: 2px;
 }
 
 .heat-good {
@@ -819,8 +1008,13 @@ tr:last-child td {
 
   .portal-grid,
   .two-column,
-  .qa-layout {
+  .qa-layout,
+  .workbench-grid {
     grid-template-columns: 1fr;
+  }
+
+  .detail-panel {
+    position: static;
   }
 }
 
@@ -904,6 +1098,10 @@ tr:last-child td {
   }
 
   .input-row {
+    grid-template-columns: 1fr;
+  }
+
+  .insight-strip {
     grid-template-columns: 1fr;
   }
 }

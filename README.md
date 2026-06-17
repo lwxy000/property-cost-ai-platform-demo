@@ -1,8 +1,10 @@
 # Property Cost AI Platform Demo
 
-A sanitized static demo for an AI-enabled property operations platform.
+A sanitized interactive front-end mock for an AI-enabled property operations platform.
 
 This repository is designed for GitHub display only. It is not a fork of any production repository, does not contain production history, does not connect to any database, and does not include real business data.
+
+The demo can be hosted as static files, but the browser experience is interactive: filters, searches, review drawers, mock workflow actions, AI import steps, heat-map drilldowns, Q&A matching and permission previews all run in local front-end state.
 
 ## What It Shows
 
@@ -10,10 +12,11 @@ This repository is designed for GitHub display only. It is not a fork of any pro
 - Portfolio command center with synthetic region, project and risk signals
 - Cost overview with 12-month budget, actual, paid and variance mock data
 - Material price library with reviewer-confirmed rows and AI import candidates
-- Cost map with regional benchmark cards, pressure heat matrix and action pool
-- Contract payment progress, due-soon queue and risk exposure
-- Smart Q&A with local match, vision extract and deep answer mock states
-- Account and permission center with role boundaries and visitor masking
+- Material AI import flow with upload, recognition, review and confirm mock steps
+- Cost map with clickable regional benchmark cards, pressure heat matrix and action pool
+- Contract payment progress, risk filtering, searchable ledger and detail drawer actions
+- Smart Q&A with typed questions, case matching, vision extract and deep answer mock states
+- Account and permission center with selectable roles and visitor masking
 
 ## Demo Scale Snapshot
 
@@ -29,7 +32,7 @@ These numbers are designed to communicate product scope. They are not production
 
 ## Demo Data Notice
 
-All organizations, regions, projects, suppliers, contracts, prices, dates and question-answer cases are fictional. The static asset in `public/assets/design-direction.png` was generated as a visual design direction and contains only mock labels.
+All organizations, regions, projects, suppliers, contracts, prices, dates and question-answer cases are fictional. The asset in `public/assets/design-direction.png` was generated as a visual design direction and contains only mock labels.
 
 No production files are required or expected.
 
@@ -45,7 +48,7 @@ Then open:
 http://127.0.0.1:4173/
 ```
 
-The app is plain HTML, CSS and JavaScript. There are no npm dependencies.
+The app is plain HTML, CSS and JavaScript. There are no npm dependencies and no server-side runtime.
 
 ## Checks
 
@@ -64,7 +67,7 @@ Before publishing, also run a manual scan for forbidden content:
 
 ## Why This Shape
 
-The first version is intentionally static. It is safer for open-source display, easy to preview locally, and can later be published through GitHub Pages after a final sensitivity review.
+The first public version is intentionally static-hostable, not interaction-free. This keeps it safer for open-source display while still demonstrating product workflows through front-end mock state. It can later be published through GitHub Pages after a final sensitivity review.
 
 ## Documentation
 
