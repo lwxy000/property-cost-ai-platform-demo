@@ -23,7 +23,18 @@ This demo is being upgraded from a module showcase into guided business-scenario
    - Contract amounts are masked.
    - Smart Q&A refuses cross-region exposure and cites mock permission rules.
 
+## Closed-loop Demo Engine
+
+The scenario page now simulates a business run without adding a backend:
+
+- each scenario keeps local progress for completed steps;
+- mock actions and next-step navigation append operation-log entries;
+- role view changes evidence masking for HQ reviewer, regional operator and external vendor;
+- the evidence chain shows which module contributes each public-safe signal;
+- the decision summary is generated from the current fictional run state.
+
+This is still a static-hostable demo. The run state lives only in browser memory and is reset by page reload or by the scenario reset control.
+
 ## Safety Boundary
 
 All scenario data is fictional. The scenario flows are recreated for public demonstration and do not copy production database records, uploads, contracts, screenshots, API responses or repository history.
-

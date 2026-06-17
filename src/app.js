@@ -25,6 +25,31 @@ import {
 
 const app = document.querySelector("#app");
 
+const scenarioRoles = ["HQ Cost Reviewer", "Regional Operator", "External Vendor"];
+
+function createScenarioRuns() {
+  return Object.fromEntries(
+    scenarioJourneys.map((scenario) => [
+      scenario.id,
+      {
+        completedSteps: scenario.steps
+          .map((step, index) => (step.state === "Done" ? index : null))
+          .filter((index) => index !== null),
+        log: [
+          {
+            time: scenario.steps[0]?.time === "Pending" ? "09:00" : scenario.steps[0]?.time || "09:00",
+            actor: scenario.owner,
+            step: scenario.steps[0]?.label || "Scenario",
+            action: "Scenario loaded",
+            result: scenario.summary,
+          },
+        ],
+        decision: "",
+      },
+    ]),
+  );
+}
+
 const state = {
   active: "scenarios",
   language: localStorage.getItem("demo-language") || "zh",
@@ -44,9 +69,11 @@ const state = {
   qaQuestion: "Can this demo approve an AI-extracted material price automatically?",
   qaResultIndex: 2,
   selectedRole: "HQ Cost Reviewer",
+  scenarioRole: "HQ Cost Reviewer",
   activeScenario: scenarioJourneys[0].id,
   activeScenarioStep: scenarioJourneys[0].currentStep,
   scenarioAction: "Open a scenario, pick a step, and simulate the next business action.",
+  scenarioRuns: createScenarioRuns(),
 };
 
 const zh = {
@@ -292,6 +319,40 @@ const zh = {
   "Previous step": "上一步",
   "Next step": "下一步",
   "Open linked module": "打开关联模块",
+  "Closed-loop engine": "业务闭环引擎",
+  "Closed-loop progress": "闭环进度",
+  "Completed steps": "已完成步骤",
+  "Run status": "运行状态",
+  "Role View": "角色视角",
+  "Role perspective": "角色视角",
+  "Visible modules": "可见模块",
+  "Evidence Chain": "证据链",
+  "Current step evidence": "当前步骤依据",
+  "Public-safe evidence chain": "公开安全证据链",
+  "Operation Log": "操作日志",
+  "Last actions": "最近动作",
+  "Decision Summary": "决策摘要",
+  "Generate decision summary": "生成决策摘要",
+  "Generate management summary": "生成管理摘要",
+  "Reset scenario run": "重置场景运行",
+  "Clear run state": "清空运行状态",
+  "No decision summary generated yet.": "尚未生成决策摘要。",
+  "Decision draft is generated from completed mock steps only.": "决策草案仅基于已完成的模拟步骤生成。",
+  "Decision summary uses fictional metrics and sanitized evidence only.": "决策摘要仅使用虚构指标和脱敏依据。",
+  "Run an action or advance a step to build the audit trail.": "执行动作或推进步骤后会生成审计轨迹。",
+  "Evidence masked for selected role": "依据已按当前角色脱敏",
+  "Current role can inspect cross-region benchmark and contract amount details.": "当前角色可查看跨区域基准与合同金额细节。",
+  "Current role sees project-scoped cost, contract and material details.": "当前角色可查看项目范围内成本、合同与材料细节。",
+  "Current role sees only vendor-safe records; amounts and cross-region signals are masked.": "当前角色仅可查看供应商安全记录，金额和跨区域信号已脱敏。",
+  "Scenario loaded": "场景已载入",
+  "Step completed": "步骤已完成",
+  "Decision draft generated": "决策草案已生成",
+  "Scenario run reset": "场景运行已重置",
+  "Role view switched": "角色视角已切换",
+  "Action registered": "动作已登记",
+  "Marked complete": "已标记完成",
+  "Ready for management review": "可提交管理复核",
+  "Requires more evidence": "仍需补充依据",
   "In progress": "进行中",
   Ready: "就绪",
   Done: "已完成",
@@ -608,6 +669,106 @@ function activeScenarioStep(scenario = activeScenario()) {
   return scenario.steps[state.activeScenarioStep] || scenario.steps[0];
 }
 
+function scenarioRun(scenario = activeScenario()) {
+  if (!state.scenarioRuns[scenario.id]) {
+    state.scenarioRuns[scenario.id] = createScenarioRuns()[scenario.id];
+  }
+  return state.scenarioRuns[scenario.id];
+}
+
+function scenarioStepState(step, index, run = scenarioRun()) {
+  if (run.completedSteps.includes(index)) return "Done";
+  if (index === state.activeScenarioStep) return "Current";
+  return "Pending";
+}
+
+function scenarioProgress(scenario = activeScenario(), run = scenarioRun(scenario)) {
+  const completed = scenario.steps.filter((step, index) => scenarioStepState(step, index, run) === "Done").length;
+  const total = scenario.steps.length;
+  const percent = Math.round((completed / total) * 100);
+  return {
+    completed,
+    total,
+    percent,
+    status: completed === total ? "Ready for management review" : "Requires more evidence",
+  };
+}
+
+function demoClock() {
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date());
+}
+
+function completeScenarioStep(index = state.activeScenarioStep) {
+  const run = scenarioRun();
+  if (!run.completedSteps.includes(index)) {
+    run.completedSteps = [...run.completedSteps, index].sort((a, b) => a - b);
+  }
+}
+
+function addScenarioLog(action, result) {
+  const scenario = activeScenario();
+  const step = activeScenarioStep(scenario);
+  const run = scenarioRun(scenario);
+  run.log = [
+    {
+      time: demoClock(),
+      actor: state.scenarioRole,
+      step: step.label,
+      action,
+      result: result || step.result,
+    },
+    ...run.log,
+  ].slice(0, 7);
+}
+
+function roleScopeText() {
+  if (state.scenarioRole === "External Vendor") {
+    return "Current role sees only vendor-safe records; amounts and cross-region signals are masked.";
+  }
+  if (state.scenarioRole === "Regional Operator") {
+    return "Current role sees project-scoped cost, contract and material details.";
+  }
+  return "Current role can inspect cross-region benchmark and contract amount details.";
+}
+
+function maskedEvidence(item) {
+  const text = t(item);
+  if (state.scenarioRole !== "External Vendor") return text;
+  return text
+    .replace(/\$[\d.,A-Z]+/g, "$***")
+    .replace(/DEMO-CT-\d{4}-\d{3}/g, "DEMO-CT-****")
+    .replace(/Region [A-Z]/g, "Scoped Region")
+    .replace(/区域 [A-Z]/g, "授权区域")
+    .replace(/Project [A-Za-z]+/g, "Scoped Project")
+    .replace(/项目 [A-Za-z]+/g, "授权项目");
+}
+
+function scenarioDecisionText(scenario, progress) {
+  if (state.language === "zh") {
+    const suffix = `当前闭环完成 ${progress.completed}/${progress.total} 步，依据均为公开版虚构样例。`;
+    if (scenario.id === "material-to-risk") {
+      return `建议：继续推进材料异常到合同风险复核，先补齐关联合同凭证，再进入模拟审批。${suffix}`;
+    }
+    if (scenario.id === "contract-payment") {
+      return `建议：暂缓付款审批，先核验服务期间、付款进度和验收依据，再由总部复核人确认。${suffix}`;
+    }
+    return `建议：保持供应商受限访问，跨区域敞口与金额继续脱敏，问答仅返回权限范围内答案。${suffix}`;
+  }
+
+  const suffix = `The run has completed ${progress.completed}/${progress.total} steps using fictional public-demo evidence only.`;
+  if (scenario.id === "material-to-risk") {
+    return `Recommendation: continue material anomaly review into contract-risk follow-up, request linked evidence before any simulated approval. ${suffix}`;
+  }
+  if (scenario.id === "contract-payment") {
+    return `Recommendation: hold payment approval until service period, paid progress and acceptance evidence are reviewed by the HQ cost role. ${suffix}`;
+  }
+  return `Recommendation: keep vendor access limited; cross-region exposure and amount details remain masked while Q&A stays role-scoped. ${suffix}`;
+}
+
 function moduleLabel(id) {
   return t(modules.find((module) => module.id === id)?.label || id);
 }
@@ -772,21 +933,26 @@ function renderScenarioCards() {
     <div class="scenario-card-grid">
       ${scenarioJourneys
         .map(
-          (scenario) => `
-            <article class="${cls("scenario-card", scenario.id === state.activeScenario && "is-active")}">
-              <div class="scenario-card-head">
-                <span>${t(scenario.status)}</span>
-                <strong>${scenario.impact}</strong>
-              </div>
-              <h3>${t(scenario.title)}</h3>
-              <p>${t(scenario.summary)}</p>
-              <div class="scenario-card-meta">
-                <span>${t("Owner")}: ${t(scenario.owner)}</span>
-                <span>${scenario.steps.length} ${state.language === "zh" ? "步" : "steps"}</span>
-              </div>
-              <button class="primary-action" data-scenario="${scenario.id}">${t(scenario.id === state.activeScenario ? "Continue scenario" : "Start scenario")}</button>
-            </article>
-          `,
+          (scenario) => {
+            const run = scenarioRun(scenario);
+            const progress = scenarioProgress(scenario, run);
+            return `
+              <article class="${cls("scenario-card", scenario.id === state.activeScenario && "is-active")}">
+                <div class="scenario-card-head">
+                  <span>${t(progress.status)}</span>
+                  <strong>${scenario.impact}</strong>
+                </div>
+                <h3>${t(scenario.title)}</h3>
+                <p>${t(scenario.summary)}</p>
+                ${progressBar(progress.percent, progress.percent === 100 ? "good" : "warning")}
+                <div class="scenario-card-meta">
+                  <span>${t("Owner")}: ${t(scenario.owner)}</span>
+                  <span>${progress.completed}/${progress.total} ${t("Completed steps")}</span>
+                </div>
+                <button class="primary-action" data-scenario="${scenario.id}">${t(scenario.id === state.activeScenario ? "Continue scenario" : "Start scenario")}</button>
+              </article>
+            `;
+          },
         )
         .join("")}
     </div>
@@ -834,6 +1000,8 @@ function scenarioActionText() {
 function scenarioTone(stateText) {
   if (stateText === "Done") return "tone-good";
   if (stateText === "Current") return "tone-warning";
+  if (stateText === "Ready for management review") return "tone-good";
+  if (stateText === "Requires more evidence") return "tone-warning";
   return "tone-neutral";
 }
 
@@ -952,16 +1120,24 @@ function renderPortal() {
 function renderScenarios() {
   const scenario = activeScenario();
   const step = activeScenarioStep(scenario);
+  const run = scenarioRun(scenario);
+  const progress = scenarioProgress(scenario, run);
+  const stepState = scenarioStepState(step, state.activeScenarioStep, run);
   const currentModule = modules.find((module) => module.id === step.module);
 
   return `
     <section class="scenario-hero panel">
       <div>
-        <p class="eyebrow">${t("Scenario command")}</p>
+        <p class="eyebrow">${t("Closed-loop engine")}</p>
         <h2>${t("Business Scenario Demo")}</h2>
         <p>${t("Module views remain available, but the demo now leads with end-to-end work scenes.")}</p>
       </div>
       <div class="scenario-hero-metrics">
+        <article class="scenario-progress-panel">
+          <span>${t("Closed-loop progress")}</span>
+          <strong>${progress.completed}/${progress.total}</strong>
+          ${progressBar(progress.percent, progress.percent === 100 ? "good" : "warning")}
+        </article>
         ${scenario.metrics
           .map(
             (metric) => `
@@ -982,18 +1158,21 @@ function renderScenarios() {
             <h2>${t(scenario.title)}</h2>
             <p>${t(scenario.summary)}</p>
           </div>
-          <span class="${cls("badge", scenario.status === "In progress" ? "tone-warning" : "tone-good")}">${t(scenario.status)}</span>
+          <span class="${cls("badge", scenarioTone(progress.status))}">${t(progress.status)}</span>
         </div>
         <div class="scenario-timeline">
           ${scenario.steps
             .map(
-              (item, index) => `
-                <button class="${cls("scenario-step", index === state.activeScenarioStep && "is-active", item.state === "Done" && "is-done")}" data-scenario-step="${index}">
+              (item, index) => {
+                const stateText = scenarioStepState(item, index, run);
+                return `
+                <button class="${cls("scenario-step", index === state.activeScenarioStep && "is-active", stateText === "Done" && "is-done")}" data-scenario-step="${index}">
                   <span>${index + 1}</span>
                   <strong>${t(item.label)}</strong>
-                  <small>${t(item.state)} · ${t(item.time)}</small>
+                  <small>${t(stateText)} · ${t(item.time)}</small>
                 </button>
-              `,
+              `;
+              },
             )
             .join("")}
         </div>
@@ -1010,17 +1189,57 @@ function renderScenarios() {
             <button class="mini-action" data-scenario-module="${step.module}">${t("Open linked module")}</button>
           </article>
         </div>
+        <div class="scenario-chain">
+          <div class="scenario-chain-head">
+            <div>
+              <h3>${t("Evidence Chain")}</h3>
+              <p>${t("Public-safe evidence chain")}</p>
+            </div>
+            <span>${progress.percent}%</span>
+          </div>
+          <div class="evidence-chain">
+            ${scenario.steps
+              .map((item, index) => {
+                const stateText = scenarioStepState(item, index, run);
+                return `
+                  <button class="${cls("chain-node", stateText === "Done" && "is-done", index === state.activeScenarioStep && "is-active")}" data-scenario-step="${index}">
+                    <span>${index + 1}</span>
+                    <strong>${t(item.label)}</strong>
+                    <small>${moduleLabel(item.module)} · ${t(stateText)}</small>
+                    <p>${item.evidence.map((evidence) => maskedEvidence(evidence)).join(" / ")}</p>
+                  </button>
+                `;
+              })
+              .join("")}
+          </div>
+        </div>
       </section>
       <aside class="panel detail-panel scenario-side">
         <div class="panel-head">
           <div>
-            <h2>${t("Evidence")}</h2>
-            <p>${t("Mock Data")}</p>
+            <h2>${t("Role View")}</h2>
+            <p>${t("Role perspective")}</p>
           </div>
-          <span class="${cls("badge", scenarioTone(step.state))}">${t(step.state)}</span>
+          <span class="${cls("badge", scenarioTone(stepState))}">${t(stepState)}</span>
         </div>
+        <div class="role-toggle scenario-role-toggle" role="group" aria-label="Scenario role view">
+          ${scenarioRoles
+            .map(
+              (role) => `
+                <button class="${role === state.scenarioRole ? "is-active" : ""}" data-scenario-role="${role}">
+                  ${t(role)}
+                </button>
+              `,
+            )
+            .join("")}
+        </div>
+        <div class="action-result">
+          <strong>${t("Visible modules")}</strong>
+          <span>${t(roleScopeText())}</span>
+        </div>
+        <h3>${t("Current step evidence")}</h3>
         <div class="evidence-list">
-          ${step.evidence.map((item) => `<span>${t(item)}</span>`).join("")}
+          ${step.evidence.map((item) => `<span>${maskedEvidence(item)}</span>`).join("")}
         </div>
         <div class="module-link-row">
           ${scenario.modules
@@ -1040,10 +1259,44 @@ function renderScenarios() {
         <div class="inline-actions">
           <button data-scenario-prev>${t("Previous step")}</button>
           <button class="primary-action" data-scenario-next>${t("Next step")}</button>
+          <button data-scenario-decision>${t("Generate decision summary")}</button>
+          <button data-scenario-reset>${t("Reset scenario run")}</button>
         </div>
         <div class="action-result">
           <strong>${t("Current business action")}</strong>
           <span>${scenarioActionText()}</span>
+        </div>
+        <div class="scenario-log">
+          <div class="scenario-chain-head">
+            <div>
+              <h3>${t("Operation Log")}</h3>
+              <p>${t("Last actions")}</p>
+            </div>
+          </div>
+          ${run.log
+            .map(
+              (entry) => `
+                <article>
+                  <time>${entry.time}</time>
+                  <div>
+                    <strong>${t(entry.action)}</strong>
+                    <span>${t(entry.actor)} · ${t(entry.step)}</span>
+                    <p>${t(entry.result)}</p>
+                  </div>
+                </article>
+              `,
+            )
+            .join("")}
+        </div>
+        <div class="decision-summary">
+          <div class="scenario-chain-head">
+            <div>
+              <h3>${t("Decision Summary")}</h3>
+              <p>${t("Decision draft is generated from completed mock steps only.")}</p>
+            </div>
+          </div>
+          <p>${run.decision ? scenarioDecisionText(scenario, progress) : t("No decision summary generated yet.")}</p>
+          <small>${t("Decision summary uses fictional metrics and sanitized evidence only.")}</small>
         </div>
       </aside>
     </div>
@@ -1676,6 +1929,8 @@ function bindPage() {
 
   document.querySelectorAll("[data-scenario-action]").forEach((button) => {
     button.addEventListener("click", () => {
+      completeScenarioStep();
+      addScenarioLog(button.dataset.scenarioAction, activeScenarioStep().result);
       state.scenarioAction = `Action "${button.dataset.scenarioAction}" simulated.`;
       render();
     });
@@ -1684,6 +1939,8 @@ function bindPage() {
   document.querySelectorAll("[data-scenario-next]").forEach((button) => {
     button.addEventListener("click", () => {
       const scenario = activeScenario();
+      completeScenarioStep();
+      addScenarioLog("Step completed", activeScenarioStep(scenario).result);
       state.activeScenarioStep = Math.min(state.activeScenarioStep + 1, scenario.steps.length - 1);
       state.scenarioAction = `Moved to "${activeScenarioStep(scenario).label}".`;
       render();
@@ -1702,6 +1959,38 @@ function bindPage() {
   document.querySelectorAll("[data-scenario-module]").forEach((button) => {
     button.addEventListener("click", () => {
       setActive(button.dataset.scenarioModule);
+    });
+  });
+
+  document.querySelectorAll("[data-scenario-role]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.scenarioRole = button.dataset.scenarioRole;
+      state.selectedRole = state.scenarioRole;
+      state.scenarioAction = "Role view switched";
+      addScenarioLog("Role view switched", roleScopeText());
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-scenario-decision]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const scenario = activeScenario();
+      const run = scenarioRun(scenario);
+      completeScenarioStep();
+      run.decision = true;
+      addScenarioLog("Decision draft generated", scenarioDecisionText(scenario, scenarioProgress(scenario, run)));
+      state.scenarioAction = "Decision draft generated";
+      render();
+    });
+  });
+
+  document.querySelectorAll("[data-scenario-reset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const scenario = activeScenario();
+      state.scenarioRuns[scenario.id] = createScenarioRuns()[scenario.id];
+      state.activeScenarioStep = scenario.currentStep || 0;
+      state.scenarioAction = "Scenario run reset";
+      render();
     });
   });
 

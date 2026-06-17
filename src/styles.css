@@ -341,6 +341,14 @@ input {
   gap: 6px;
 }
 
+.scenario-progress-panel {
+  grid-column: 1 / -1;
+}
+
+.scenario-progress-panel .progress {
+  width: 100%;
+}
+
 .scenario-hero-metrics span,
 .scenario-card p,
 .scenario-card-meta,
@@ -354,6 +362,10 @@ input {
 .scenario-card {
   background: var(--panel);
   box-shadow: var(--shadow);
+}
+
+.scenario-card .progress {
+  width: 100%;
 }
 
 .scenario-card.is-active {
@@ -468,9 +480,123 @@ input {
   margin: 0;
 }
 
+.scenario-chain {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.scenario-chain-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.scenario-chain-head h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+
+.scenario-chain-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.scenario-chain-head span {
+  color: var(--teal);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.evidence-chain {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.chain-node {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 4px 9px;
+  min-height: 118px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px;
+  text-align: left;
+}
+
+.chain-node span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #e7ecef;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.chain-node strong,
+.chain-node small,
+.chain-node p {
+  min-width: 0;
+}
+
+.chain-node small,
+.chain-node p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.chain-node p {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  line-height: 1.45;
+}
+
+.chain-node.is-active {
+  border-color: rgba(12, 122, 123, 0.55);
+  background: var(--teal-soft);
+}
+
+.chain-node.is-done span {
+  background: var(--green);
+  color: #fff;
+}
+
 .scenario-side h3 {
   margin: 0;
   font-size: 15px;
+}
+
+.scenario-role-toggle {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.scenario-role-toggle button {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--muted);
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.scenario-role-toggle button.is-active {
+  border-color: var(--teal);
+  background: var(--teal);
+  color: #fff;
 }
 
 .evidence-list,
@@ -517,6 +643,63 @@ input {
 
 .scenario-actions button:hover {
   border-color: rgba(12, 122, 123, 0.5);
+}
+
+.scenario-log,
+.decision-summary {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.scenario-log article {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  padding: 10px;
+}
+
+.scenario-log time {
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.scenario-log strong,
+.scenario-log span,
+.scenario-log p {
+  min-width: 0;
+}
+
+.scenario-log strong {
+  display: block;
+  font-size: 13px;
+}
+
+.scenario-log span,
+.scenario-log p,
+.decision-summary p,
+.decision-summary small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.scenario-log p,
+.decision-summary p {
+  margin: 4px 0 0;
+  line-height: 1.5;
+}
+
+.decision-summary {
+  border: 1px solid rgba(12, 122, 123, 0.22);
+  border-radius: 8px;
+  background: #f2fbfa;
+  padding: 12px;
 }
 
 .panel {
@@ -1354,7 +1537,13 @@ tr:last-child td {
   }
 
   .scenario-hero-metrics,
-  .scenario-detail-grid {
+  .scenario-detail-grid,
+  .evidence-chain,
+  .scenario-role-toggle {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-log article {
     grid-template-columns: 1fr;
   }
 }

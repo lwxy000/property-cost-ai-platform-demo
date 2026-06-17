@@ -15,6 +15,7 @@ Current focus: this repository is being refined locally from a module showcase i
 - Portal home for module routing
 - Chinese / English language switch with local browser state
 - Guided business scenarios that connect material import, price library review, cost-map anomaly, contract risk, Smart Q&A and permission masking
+- Closed-loop scenario engine with local progress, operation log, evidence chain, role perspective and generated decision summary
 - Portfolio command center with synthetic region, project and risk signals
 - Cost overview with 12-month budget, actual, paid and variance mock data
 - Material price library with reviewer-confirmed rows and AI import candidates
@@ -35,6 +36,15 @@ The public demo now uses a richer fictional operating model:
 - A cost-map action pool with $4.30M in fictional savings opportunities
 
 These numbers are designed to communicate product scope. They are not production metrics.
+
+## Interaction Model
+
+The scenario page behaves like a browser-only operations workbench:
+
+- Scenario progress is stored in local front-end memory for the current session.
+- Mock actions mark steps complete and append operation-log entries.
+- Role view changes evidence masking without calling any account service.
+- Decision summaries are generated from fictional scenario state only.
 
 ## Demo Data Notice
 
