@@ -321,6 +321,12 @@ const zh = {
   "Business Scenario Demo": "业务场景演示",
   "Portfolio operating command": "组合经营总控",
   "Sanitized executive view across cost, material, contract, AI and permission workflows.": "跨成本、材料、合同、AI 与权限流程的脱敏经营视图。",
+  "AI Operations Decision Center": "AI 运营决策中枢",
+  "Primary decision focus": "主决策焦点",
+  "Risk Exposure": "风险敞口",
+  "Urgent Risks": "紧急风险",
+  "Executive scale indicators": "经营规模指标",
+  "Run chain to decision": "跑通链路并生成决策",
   "Demo launchpad": "演示启动台",
   "One-click business chain": "一键业务链",
   "AI import to decision-ready evidence trail": "从 AI 导入到可决策依据链",
@@ -1125,15 +1131,77 @@ function renderPortal() {
   const chainDone = progress.percent === 100;
 
   return `
-    <section class="cockpit-hero panel">
-      <div class="cockpit-hero-copy">
-        <p class="eyebrow">${t("Portfolio operating command")}</p>
-        <h2>${t("Executive Cockpit")}</h2>
-        <p>${t("Sanitized executive view across cost, material, contract, AI and permission workflows.")}</p>
-        <div class="inline-actions">
-          <button class="primary-action" data-cockpit-run>${t("Run full business chain")}</button>
+    <section class="cockpit-focus panel">
+      <div class="cockpit-command-card">
+        <div class="cockpit-focus-copy">
+          <p class="eyebrow">${t("Primary decision focus")}</p>
+          <h2>${t("AI Operations Decision Center")}</h2>
+          <p>${t("Sanitized executive view across cost, material, contract, AI and permission workflows.")}</p>
+        </div>
+        <div class="decision-scoreboard">
+          <article class="score-risk">
+            <span>${t("Risk Exposure")}</span>
+            <strong>$9.26M</strong>
+            <small>${t("Across 41 projects")}</small>
+          </article>
+          <article class="score-decision">
+            <span>${t("Decision Ready")}</span>
+            <strong>${progress.completed}/${progress.total}</strong>
+            <small>${t(chainDone ? "Chain completed" : "Chain not complete")}</small>
+          </article>
+          <article class="score-saving">
+            <span>${t("Savings Pipeline")}</span>
+            <strong>$4.30M</strong>
+            <small>${t("Top actions by synthetic impact")}</small>
+          </article>
+        </div>
+        <div class="focus-chain">
+          ${scenario.steps
+            .map((item, index) => {
+              const stateText = scenarioStepState(item, index, run);
+              return `
+                <button class="${cls("focus-chain-step", stateText === "Done" && "is-done", index === state.activeScenarioStep && "is-active")}" data-cockpit-step="${index}">
+                  <span>${index + 1}</span>
+                  <strong>${t(item.label)}</strong>
+                </button>
+              `;
+            })
+            .join("")}
+        </div>
+        <div class="focus-actions">
+          <button class="primary-action" data-cockpit-run>${t("Run chain to decision")}</button>
           <button data-nav="scenarios">${t("Open scenario engine")}</button>
           <button data-nav="costMap">${t("Open regional battle map")}</button>
+        </div>
+      </div>
+      <aside class="urgent-risk-panel">
+        <div class="panel-head">
+          <div>
+            <h2>${t("Urgent Risks")}</h2>
+            <p>${t("Board-level fictional alerts")}</p>
+          </div>
+        </div>
+        <div class="urgent-risk-list">
+          ${commandCenter
+            .map(
+              (item) => `
+                <article class="${toneClass(item.tone)}">
+                  <span>${t(item.label)}</span>
+                  <strong>${item.value}</strong>
+                  <small>${t(item.meta)}</small>
+                </article>
+              `,
+            )
+            .join("")}
+        </div>
+      </aside>
+    </section>
+
+    <section class="cockpit-metric-strip panel" aria-label="Executive scale indicators">
+      <div class="panel-head">
+        <div>
+          <h2>${t("Executive scale indicators")}</h2>
+          <p>${portfolio.asOf}</p>
         </div>
       </div>
       <div class="cockpit-kpi-grid">

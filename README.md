@@ -2,6 +2,8 @@
 
 A sanitized interactive front-end mock for an AI-enabled property operations platform.
 
+![Executive cockpit preview](public/assets/cockpit-preview.png)
+
 This repository is designed for GitHub display only. It is not a fork of any production repository, does not contain production history, does not connect to any database, and does not include real business data.
 
 The demo can be hosted as static files, but the browser experience is interactive: filters, searches, review drawers, mock workflow actions, AI import steps, heat-map drilldowns, Q&A matching and permission previews all run in local front-end state.
