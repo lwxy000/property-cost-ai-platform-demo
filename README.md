@@ -6,7 +6,15 @@ This repository is a public showcase version built for GitHub display. It demons
 
 ![Executive cockpit preview](public/assets/cockpit-preview.png)
 
-Static front-end | Mock data only | No backend | Chinese / English | GitHub Pages ready after final review
+Static front-end | Mock data only | No backend | Chinese / English | Live on GitHub Pages
+
+## Live Demo
+
+Open the public demo:
+
+```text
+https://lwxy000.github.io/property-cost-ai-platform-demo/
+```
 
 ## 中文摘要
 
@@ -179,15 +187,19 @@ Before enabling any public hosting, also perform a manual sensitivity scan for:
 
 ## GitHub Pages
 
-The demo is compatible with static hosting. GitHub Pages can be enabled after the public release checklist is complete.
+The demo is published through GitHub Pages:
 
-Recommended first release path:
+```text
+https://lwxy000.github.io/property-cost-ai-platform-demo/
+```
+
+Recommended release discipline:
 
 1. keep the repository independent from production;
 2. run `npm run check`;
 3. complete the manual sensitivity scan;
 4. capture final screenshots or a short GIF walkthrough;
-5. enable GitHub Pages only after the review is clean.
+5. update the public demo only after the review is clean.
 
 ## Documentation
 
