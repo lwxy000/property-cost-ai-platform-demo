@@ -2,6 +2,13 @@
 
 Use this checklist before publishing the demo repository or enabling GitHub Pages.
 
+## Current Public Demo Status
+
+- Repository: public demo repository, independent from production history.
+- Live demo: `https://lwxy000.github.io/property-cost-ai-platform-demo/`
+- Verified on: 2026-06-18.
+- Verification used: `npm.cmd run check`, GitHub repository visibility check and live GitHub Pages browser load.
+
 ## Repository Safety
 
 - Confirm this repository was created independently and is not a public fork of a production repository.
@@ -30,4 +37,3 @@ npm run check
 ```
 
 Run a text scan for internal names, domains, IPs, credentials and file-system paths before publishing.
-
