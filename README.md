@@ -31,8 +31,30 @@ Local routes after starting the server:
 - `http://127.0.0.1:4173/#scenarios`
 - `http://127.0.0.1:4173/#costMap`
 - `http://127.0.0.1:4173/#contracts`
-- `http://127.0.0.1:4173/#assistant`
+- `http://127.0.0.1:4173/#smartQA`
 - `http://127.0.0.1:4173/#accounts`
+
+## Screenshots
+
+### Executive Cockpit
+
+![Executive cockpit](public/assets/cockpit-preview.png)
+
+### Guided Business Scenario
+
+![Guided business scenario](public/assets/readme-scenarios.png)
+
+### Regional Cost Map
+
+![Regional cost map](public/assets/readme-cost-map.png)
+
+### Contract Management
+
+![Contract management](public/assets/readme-contracts.png)
+
+### Smart Q&A
+
+![Smart Q&A](public/assets/readme-assistant.png)
 
 ## Product Story
 
