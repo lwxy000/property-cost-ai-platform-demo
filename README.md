@@ -16,6 +16,12 @@ Open the public demo:
 https://lwxy000.github.io/property-cost-ai-platform-demo/
 ```
 
+Open the guided demo tour:
+
+```text
+https://lwxy000.github.io/property-cost-ai-platform-demo/?tour=1
+```
+
 ## 中文摘要
 
 这是一个面向 GitHub 展示的脱敏 Demo，用来呈现“物业 / 采购 / 成本 / 合同 / 材料 / 智能问答 / 权限中心”一体化运营平台的产品能力。
@@ -24,7 +30,7 @@ https://lwxy000.github.io/property-cost-ai-platform-demo/
 
 ## What To Try First
 
-Use this short path when reviewing the demo:
+Use the guided tour link for a hands-off walkthrough, or follow this short path manually:
 
 1. Open the executive cockpit and read the portfolio-level pressure signal.
 2. Trigger the one-click decision chain to simulate a full material-cost-contract-AI workflow.

@@ -26,6 +26,139 @@ import {
 const app = document.querySelector("#app");
 
 const scenarioRoles = ["HQ Cost Reviewer", "Regional Operator", "External Vendor"];
+const tourStepDelay = 3600;
+let tourTimer = null;
+let tourActionTimer = null;
+let tourAutoStarted = false;
+
+const tourSteps = [
+  {
+    module: "portal",
+    target: "[data-tour-target='decision-center']",
+    title: {
+      zh: "先看经营决策焦点",
+      en: "Start with the executive decision focus",
+    },
+    body: {
+      zh: "陌生访客不用自己摸索，演示会先把风险敞口、可决策进度和节降机会聚到一个主画面。",
+      en: "The tour starts by grouping risk exposure, decision progress and savings opportunities into one cockpit.",
+    },
+  },
+  {
+    module: "portal",
+    target: "[data-tour-target='run-chain']",
+    title: {
+      zh: "一键跑通业务链",
+      en: "Run the business chain",
+    },
+    body: {
+      zh: "虚拟鼠标会触发材料、成本、合同、问答和权限的闭环动作，让 Demo 马上进入有结果的状态。",
+      en: "The cursor triggers the material, cost, contract, Q&A and permission loop so the demo shows a result state.",
+    },
+    action: () => runFullBusinessChain(),
+  },
+  {
+    module: "scenarios",
+    target: "[data-tour-target='scenario-engine']",
+    title: {
+      zh: "进入端到端业务场景",
+      en: "Open the end-to-end scenario",
+    },
+    body: {
+      zh: "这里展示从 AI 导入、价格库复核到合同风险的证据链，而不是孤立模块菜单。",
+      en: "This view connects AI import, price review and contract risk as one evidence chain instead of isolated modules.",
+    },
+    prepare: () => {
+      state.activeScenario = scenarioJourneys[0].id;
+      state.activeScenarioStep = 2;
+    },
+  },
+  {
+    module: "costMap",
+    target: "[data-tour-target='regional-battle']",
+    title: {
+      zh: "定位区域成本异常",
+      en: "Find the regional cost anomaly",
+    },
+    body: {
+      zh: "成本地图把区域排名、风险雷达和建议动作放在一起，访客能立刻看到压力点。",
+      en: "The cost map combines ranking, radar and suggested actions so the pressure point is obvious.",
+    },
+    prepare: () => {
+      state.selectedHeat = { region: "Region F", category: "Repair" };
+    },
+  },
+  {
+    module: "costMap",
+    target: "[data-tour-target='savings-action']",
+    title: {
+      zh: "把异常变成节降动作",
+      en: "Turn pressure into savings action",
+    },
+    body: {
+      zh: "这里不是只报表，而是把高压区域关联到节降负责人、影响金额和后续处理池。",
+      en: "This is not just reporting. It links pressure to an owner, impact value and follow-up action pool.",
+    },
+  },
+  {
+    module: "contracts",
+    target: "[data-tour-target='contract-risk']",
+    title: {
+      zh: "联动合同付款风险",
+      en: "Link contract payment risk",
+    },
+    body: {
+      zh: "同一条业务线继续下钻到合同台账，展示付款进度、风险原因和模拟复核动作。",
+      en: "The same story drills into the contract ledger with payment progress, risk reasons and mock review actions.",
+    },
+    prepare: () => {
+      state.contractRisk = "High";
+      state.selectedContractNo = contracts[0].no;
+    },
+  },
+  {
+    module: "smartQA",
+    target: "[data-tour-target='smart-qa']",
+    title: {
+      zh: "用智能问答解释决策依据",
+      en: "Explain the decision with Smart Q&A",
+    },
+    body: {
+      zh: "问答模块用本地样例展示“为什么不能自动准入”“证据来自哪里”，强调安全边界。",
+      en: "Smart Q&A explains why automatic approval is blocked and where the safe demo evidence comes from.",
+    },
+    prepare: () => {
+      state.qaMode = "Deep answer";
+      state.qaResultIndex = 2;
+    },
+  },
+  {
+    module: "accounts",
+    target: "[data-tour-target='role-masking']",
+    title: {
+      zh: "最后展示权限脱敏",
+      en: "Finish with role-based masking",
+    },
+    body: {
+      zh: "同一套数据按角色展示不同可见范围，证明公开 Demo 也保留了权限和脱敏意识。",
+      en: "The final step shows how the same data is masked by role, keeping permission boundaries visible.",
+    },
+    prepare: () => {
+      state.selectedRole = "External Vendor";
+    },
+  },
+];
+
+const tourUi = {
+  start: { zh: "开始演示", en: "Start Demo Tour" },
+  active: { zh: "导览中", en: "Guided Demo" },
+  prev: { zh: "上一步", en: "Prev" },
+  pause: { zh: "暂停", en: "Pause" },
+  resume: { zh: "继续", en: "Resume" },
+  next: { zh: "下一步", en: "Next" },
+  finish: { zh: "完成", en: "Finish" },
+  skip: { zh: "跳过", en: "Skip" },
+};
 
 function createScenarioRuns() {
   return Object.fromEntries(
@@ -74,6 +207,12 @@ const state = {
   activeScenarioStep: scenarioJourneys[0].currentStep,
   scenarioAction: "Open a scenario, pick a step, and simulate the next business action.",
   scenarioRuns: createScenarioRuns(),
+  tour: {
+    active: false,
+    index: 0,
+    paused: false,
+    appliedSteps: new Set(),
+  },
 };
 
 const zh = {
@@ -839,9 +978,189 @@ function scopeRows(rows, areaKey = "area", projectKey = "project") {
 }
 
 function setActive(id) {
+  stopTour();
   state.active = id;
   window.location.hash = id;
   render();
+}
+
+function tourText(step, key) {
+  return step[key]?.[state.language] || step[key]?.en || "";
+}
+
+function tourUiText(key) {
+  return tourUi[key]?.[state.language] || tourUi[key]?.en || "";
+}
+
+function activeTourStep() {
+  return tourSteps[state.tour.index] || tourSteps[0];
+}
+
+function tourUrlForStep(step) {
+  return `${window.location.pathname}${window.location.search}#${step.module}`;
+}
+
+function clearTourTimers() {
+  if (tourTimer) {
+    window.clearTimeout(tourTimer);
+    tourTimer = null;
+  }
+  if (tourActionTimer) {
+    window.clearTimeout(tourActionTimer);
+    tourActionTimer = null;
+  }
+}
+
+function stopTour() {
+  if (!state.tour.active) return;
+  clearTourTimers();
+  state.tour.active = false;
+  state.tour.paused = false;
+  state.tour.index = 0;
+  state.tour.appliedSteps = new Set();
+}
+
+function startTour() {
+  clearTourTimers();
+  state.tour.active = true;
+  state.tour.paused = false;
+  state.tour.index = 0;
+  state.tour.appliedSteps = new Set();
+  goToTourStep(0);
+}
+
+function goToTourStep(index) {
+  clearTourTimers();
+  const boundedIndex = Math.max(0, Math.min(index, tourSteps.length - 1));
+  const step = tourSteps[boundedIndex];
+  state.tour.active = true;
+  state.tour.index = boundedIndex;
+  state.active = step.module;
+  if (step.prepare) step.prepare();
+  window.history.replaceState(null, "", tourUrlForStep(step));
+  render();
+  window.requestAnimationFrame(() => {
+    updateTourFrame();
+    scheduleTourStep();
+  });
+}
+
+function nextTourStep() {
+  if (state.tour.index >= tourSteps.length - 1) {
+    stopTour();
+    render();
+    return;
+  }
+  goToTourStep(state.tour.index + 1);
+}
+
+function previousTourStep() {
+  goToTourStep(state.tour.index - 1);
+}
+
+function toggleTourPause() {
+  state.tour.paused = !state.tour.paused;
+  if (state.tour.paused) {
+    clearTourTimers();
+  } else {
+    scheduleTourStep();
+  }
+  updateTourControls();
+}
+
+function scheduleTourStep() {
+  clearTourTimers();
+  if (!state.tour.active || state.tour.paused) return;
+  const step = activeTourStep();
+  const shouldApplyAction = step.action && !state.tour.appliedSteps.has(state.tour.index);
+
+  if (shouldApplyAction) {
+    tourActionTimer = window.setTimeout(() => {
+      if (!state.tour.active || state.tour.paused) return;
+      step.action();
+      state.tour.appliedSteps.add(state.tour.index);
+      render();
+      window.requestAnimationFrame(() => updateTourFrame());
+      tourTimer = window.setTimeout(nextTourStep, tourStepDelay);
+    }, 950);
+    return;
+  }
+
+  tourTimer = window.setTimeout(nextTourStep, tourStepDelay);
+}
+
+function updateTourControls() {
+  const pauseButton = document.querySelector("[data-tour-pause]");
+  if (pauseButton) pauseButton.textContent = state.tour.paused ? tourUiText("resume") : tourUiText("pause");
+}
+
+function positionTourElements(target) {
+  const overlay = document.querySelector("[data-tour-overlay]");
+  if (!overlay || !target) return;
+  const rect = target.getBoundingClientRect();
+  const pad = 8;
+  const x = Math.max(8, rect.left - pad);
+  const y = Math.max(8, rect.top - pad);
+  const w = Math.min(window.innerWidth - x - 8, rect.width + pad * 2);
+  const h = Math.min(window.innerHeight - y - 8, rect.height + pad * 2);
+  const cardWidth = Math.min(380, window.innerWidth - 32);
+  const cardHeight = 220;
+  const gap = 18;
+  let cardX = x + w + gap;
+  if (cardX + cardWidth > window.innerWidth - 16) cardX = x - cardWidth - gap;
+  if (cardX < 16) cardX = 16;
+  let cardY = Math.min(Math.max(16, y), window.innerHeight - cardHeight - 16);
+  if (window.innerWidth <= 760) {
+    cardX = 14;
+    cardY = Math.max(14, window.innerHeight - cardHeight - 14);
+  }
+
+  overlay.style.setProperty("--tour-x", `${x}px`);
+  overlay.style.setProperty("--tour-y", `${y}px`);
+  overlay.style.setProperty("--tour-w", `${w}px`);
+  overlay.style.setProperty("--tour-h", `${h}px`);
+  overlay.style.setProperty("--tour-cursor-x", `${x + Math.min(w * 0.68, w - 16)}px`);
+  overlay.style.setProperty("--tour-cursor-y", `${y + Math.min(h * 0.58, h - 12)}px`);
+  overlay.style.setProperty("--tour-card-x", `${cardX}px`);
+  overlay.style.setProperty("--tour-card-y", `${cardY}px`);
+}
+
+function updateTourFrame() {
+  if (!state.tour.active) return;
+  const step = activeTourStep();
+  const target = document.querySelector(step.target) || document.querySelector(".content");
+  if (!target) return;
+  target.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
+  window.setTimeout(() => positionTourElements(target), 260);
+  updateTourControls();
+}
+
+function renderTourOverlay() {
+  if (!state.tour.active) return "";
+  const step = activeTourStep();
+  const progress = Math.round(((state.tour.index + 1) / tourSteps.length) * 100);
+  return `
+    <div class="tour-overlay" data-tour-overlay aria-live="polite">
+      <div class="tour-scrim"></div>
+      <div class="tour-spotlight"></div>
+      <div class="tour-cursor" aria-hidden="true"><span></span></div>
+      <article class="tour-card">
+        <div class="tour-card-head">
+          <span>Guided Demo</span>
+          <strong>${state.tour.index + 1}/${tourSteps.length}</strong>
+        </div>
+        <h2>${tourText(step, "title")}</h2>
+        <p>${tourText(step, "body")}</p>
+        <div class="tour-progress" aria-label="Guided demo progress"><i style="width:${progress}%"></i></div>
+        <div class="tour-controls">
+          <button data-tour-prev ${state.tour.index === 0 ? "disabled" : ""}>${tourUiText("prev")}</button>
+          <button data-tour-pause>${state.tour.paused ? tourUiText("resume") : tourUiText("pause")}</button>
+          <button data-tour-next>${state.tour.index === tourSteps.length - 1 ? tourUiText("finish") : tourUiText("next")}</button>
+          <button class="link-button" data-tour-stop>${tourUiText("skip")}</button>
+        </div>
+      </article>
+    </div>
+  `;
 }
 
 function optionList(options, current) {
@@ -897,6 +1216,10 @@ function renderShell(content) {
               <span>${t("Project")}</span>
               <select id="projectSelect">${optionList(portfolio.projects, state.project)}</select>
             </label>
+            <button class="tour-launch" data-tour-start data-tour-target="tour-start">
+              <span></span>
+              ${state.tour.active ? tourUiText("active") : tourUiText("start")}
+            </button>
             <div class="language-toggle" role="group" aria-label="Language">
               <button class="${state.language === "zh" ? "is-active" : ""}" data-lang="zh">中文</button>
               <button class="${state.language === "en" ? "is-active" : ""}" data-lang="en">EN</button>
@@ -907,6 +1230,7 @@ function renderShell(content) {
         <section class="content">${content}</section>
       </main>
     </div>
+    ${renderTourOverlay()}
   `;
 
   bindShell();
@@ -915,6 +1239,29 @@ function renderShell(content) {
 function bindShell() {
   document.querySelectorAll("[data-nav]").forEach((button) => {
     button.addEventListener("click", () => setActive(button.dataset.nav));
+  });
+
+  document.querySelectorAll("[data-tour-start]").forEach((button) => {
+    button.addEventListener("click", startTour);
+  });
+
+  document.querySelectorAll("[data-tour-prev]").forEach((button) => {
+    button.addEventListener("click", previousTourStep);
+  });
+
+  document.querySelectorAll("[data-tour-next]").forEach((button) => {
+    button.addEventListener("click", nextTourStep);
+  });
+
+  document.querySelectorAll("[data-tour-pause]").forEach((button) => {
+    button.addEventListener("click", toggleTourPause);
+  });
+
+  document.querySelectorAll("[data-tour-stop]").forEach((button) => {
+    button.addEventListener("click", () => {
+      stopTour();
+      render();
+    });
   });
 
   const regionSelect = document.querySelector("#regionSelect");
@@ -1131,7 +1478,7 @@ function renderPortal() {
   const chainDone = progress.percent === 100;
 
   return `
-    <section class="cockpit-focus panel">
+    <section class="cockpit-focus panel" data-tour-target="decision-center">
       <div class="cockpit-command-card">
         <div class="cockpit-focus-copy">
           <p class="eyebrow">${t("Primary decision focus")}</p>
@@ -1169,7 +1516,7 @@ function renderPortal() {
             .join("")}
         </div>
         <div class="focus-actions">
-          <button class="primary-action" data-cockpit-run>${t("Run chain to decision")}</button>
+          <button class="primary-action" data-cockpit-run data-tour-target="run-chain">${t("Run chain to decision")}</button>
           <button data-nav="scenarios">${t("Open scenario engine")}</button>
           <button data-nav="costMap">${t("Open regional battle map")}</button>
         </div>
@@ -1451,7 +1798,7 @@ function renderScenarios() {
   const currentModule = modules.find((module) => module.id === step.module);
 
   return `
-    <section class="scenario-hero panel">
+    <section class="scenario-hero panel" data-tour-target="scenario-engine">
       <div>
         <p class="eyebrow">${t("Closed-loop engine")}</p>
         <h2>${t("Business Scenario Demo")}</h2>
@@ -1837,7 +2184,7 @@ function renderCostMap() {
           .join("")}
       </div>
     </section>
-    <section class="panel battle-map-panel">
+    <section class="panel battle-map-panel" data-tour-target="regional-battle">
       <div class="panel-head">
         <div>
           <h2>${t("Regional Battle Map")}</h2>
@@ -1877,7 +2224,7 @@ function renderCostMap() {
             `).join("")}
           </div>
         </div>
-        <div class="battle-evidence-stack">
+        <div class="battle-evidence-stack" data-tour-target="savings-action">
           <div class="scenario-chain-head">
             <div>
               <h3>${t("Linked evidence trail")}</h3>
@@ -2020,7 +2367,7 @@ function renderContracts() {
 
   return `
     ${kpiCards(contractKpis)}
-    <div class="workbench-grid">
+    <div class="workbench-grid" data-tour-target="contract-risk">
       <section class="panel panel-large">
         <div class="panel-head">
           <div>
@@ -2122,7 +2469,7 @@ function renderSmartQA() {
   const currentCase = qaCases[state.qaResultIndex] || qaCases[0];
 
   return `
-    <div class="qa-layout">
+    <div class="qa-layout" data-tour-target="smart-qa">
       <section class="panel panel-large">
         <div class="panel-head">
           <div>
@@ -2228,7 +2575,7 @@ function renderAccounts() {
           <article><span>${t("Smart Q&A")}</span><strong>${t(selectedRole.qa)}</strong></article>
           <article><span>${t("Accounts")}</span><strong>${t(selectedRole.account)}</strong></article>
         </div>
-        <div class="mask-demo">
+        <div class="mask-demo" data-tour-target="role-masking">
           <span>${t("Contract Amount")}</span>
           <strong>${selectedRole.contracts === "Limited" || selectedRole.contracts === "None" ? "$***,***" : "$96.8M"}</strong>
           <small>${t(selectedRole.contracts === "Limited" || selectedRole.contracts === "None" ? "Masked by selected role" : "Visible in demo role")}</small>
@@ -2292,6 +2639,9 @@ function render() {
 
   renderShell((views[state.active] || renderPortal)());
   bindPage();
+  if (state.tour.active) {
+    window.requestAnimationFrame(updateTourFrame);
+  }
 }
 
 function bindPage() {
@@ -2566,7 +2916,13 @@ function boot() {
     state.active = hash;
   }
   render();
+  const params = new URLSearchParams(window.location.search);
+  if (!tourAutoStarted && (params.get("tour") === "1" || params.get("tour") === "true")) {
+    tourAutoStarted = true;
+    startTour();
+  }
 }
 
 window.addEventListener("hashchange", boot);
+window.addEventListener("resize", updateTourFrame);
 boot();
