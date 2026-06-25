@@ -22,6 +22,23 @@ Open the guided demo tour:
 https://lwxy000.github.io/property-cost-ai-platform-demo/?tour=1
 ```
 
+Open the product handbook:
+
+```text
+https://lwxy000.github.io/property-cost-ai-platform-demo/handbook.html
+```
+
+## Product Handbook
+
+This demo now includes a public product handbook package for customer-facing explanation:
+
+- [Live product handbook](https://lwxy000.github.io/property-cost-ai-platform-demo/handbook.html)
+- [Chinese product handbook copy](docs/product-handbook.zh.md)
+- [One-page Chinese brief](docs/one-page-brief.zh.md)
+- [IMAGE-2 visual direction](docs/visual-direction.md)
+
+The handbook positions the demo as a Vibe-Coding powered lightweight AI business system: quick to pilot, easy to adjust, cost controlled and designed around real property procurement, cost, contract and material operations.
+
 ## 中文摘要
 
 这是一个面向 GitHub 展示的脱敏 Demo，用来呈现“物业 / 采购 / 成本 / 合同 / 材料 / 智能问答 / 权限中心”一体化运营平台的产品能力。
@@ -213,6 +230,9 @@ Recommended release discipline:
 - [Data sanitization](docs/data-sanitization.md)
 - [Product story](docs/product-story.md)
 - [Business scenarios](docs/business-scenarios.md)
+- [Product handbook Chinese copy](docs/product-handbook.zh.md)
+- [One-page Chinese brief](docs/one-page-brief.zh.md)
+- [IMAGE-2 visual direction](docs/visual-direction.md)
 - [Public release checklist](docs/public-release-checklist.md)
 
 ## License

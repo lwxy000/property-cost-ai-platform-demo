@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>房地产成本人工智能平台产品手册</title>
+    <style>
+      :root {
+        --ink: #0f3d34;
+        --ink-2: #174f45;
+        --mint: #2aa692;
+        --paper: #f6f4ef;
+        --paper-2: #ebe6dc;
+        --line: rgba(15, 61, 52, 0.16);
+        --graphite: #1f2328;
+        --muted: #65716f;
+        --risk: #ff6b57;
+        --white: #ffffff;
+        --shadow: 0 24px 70px rgba(15, 61, 52, 0.16);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--graphite);
+        font-family:
+          "Source Han Sans SC",
+          "Noto Sans CJK SC",
+          "Microsoft YaHei",
+          Arial,
+          sans-serif;
+        background:
+          radial-gradient(circle at 20% 0%, rgba(42, 166, 146, 0.14), transparent 34rem),
+          linear-gradient(180deg, #fbfaf7 0%, var(--paper) 42%, #ffffff 100%);
+        letter-spacing: 0;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.85rem clamp(1rem, 4vw, 3rem);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        color: #f9fffd;
+        background: rgba(15, 61, 52, 0.92);
+        backdrop-filter: blur(18px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        min-width: 0;
+        font-weight: 800;
+      }
+
+      .mark {
+        display: grid;
+        width: 2.25rem;
+        height: 2.25rem;
+        place-items: center;
+        border-radius: 0.55rem;
+        background: #dff6ee;
+        color: var(--ink);
+        font-weight: 900;
+      }
+
+      .nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.45rem;
+      }
+
+      .nav a {
+        border-radius: 999px;
+        padding: 0.48rem 0.75rem;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 0.88rem;
+      }
+
+      .nav a:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .section {
+        padding: clamp(3rem, 7vw, 6.5rem) clamp(1rem, 4vw, 3rem);
+      }
+
+      .inner {
+        width: min(1180px, 100%);
+        margin: 0 auto;
+      }
+
+      .hero {
+        color: #f8fffc;
+        background:
+          linear-gradient(105deg, rgba(15, 61, 52, 0.98) 0%, rgba(15, 61, 52, 0.92) 47%, rgba(23, 79, 69, 0.78) 100%),
+          url("public/assets/cockpit-preview.png") center right / cover;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.78fr);
+        align-items: center;
+        gap: clamp(2rem, 5vw, 4rem);
+        min-height: 78vh;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0 1.2rem;
+        padding: 0.45rem 0.75rem;
+        border: 1px solid rgba(221, 246, 238, 0.26);
+        border-radius: 999px;
+        color: #dff6ee;
+        font-weight: 700;
+        font-size: 0.9rem;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 12em;
+        margin-bottom: 1.1rem;
+        color: #ffffff;
+        font-size: clamp(2.6rem, 6.6vw, 5.6rem);
+        line-height: 1.04;
+      }
+
+      .lead {
+        max-width: 48rem;
+        color: rgba(248, 255, 252, 0.86);
+        font-size: clamp(1.05rem, 2vw, 1.34rem);
+        line-height: 1.75;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 2rem;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 2.8rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.55rem;
+        padding: 0.76rem 1rem;
+        font-weight: 800;
+      }
+
+      .button.primary {
+        color: var(--ink);
+        background: #dff6ee;
+      }
+
+      .button.secondary {
+        border: 1px solid rgba(255, 255, 255, 0.26);
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .hero-panel {
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 0.75rem;
+        padding: 1.15rem;
+        background: rgba(246, 244, 239, 0.12);
+        box-shadow: var(--shadow);
+      }
+
+      .hero-panel img,
+      .visual-board img {
+        display: block;
+        width: 100%;
+        border-radius: 0.55rem;
+      }
+
+      .metric-strip {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .metric {
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 0.55rem;
+        padding: 0.95rem;
+        background: rgba(15, 61, 52, 0.5);
+      }
+
+      .metric strong {
+        display: block;
+        color: #ffffff;
+        font-size: 1.35rem;
+      }
+
+      .metric span {
+        color: rgba(248, 255, 252, 0.72);
+        font-size: 0.84rem;
+      }
+
+      .section-heading {
+        display: grid;
+        grid-template-columns: minmax(0, 0.78fr) minmax(260px, 0.42fr);
+        gap: 2rem;
+        align-items: end;
+        margin-bottom: 2rem;
+      }
+
+      .section-heading h2 {
+        margin-bottom: 0.7rem;
+        color: var(--ink);
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        line-height: 1.15;
+      }
+
+      .section-heading p,
+      .muted {
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .tagline {
+        color: var(--risk);
+        font-weight: 900;
+      }
+
+      .pain-grid,
+      .capability-grid,
+      .mode-grid,
+      .steps,
+      .proof-grid {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .pain-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .capability-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .mode-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .steps,
+      .proof-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .card {
+        min-height: 100%;
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        padding: 1.1rem;
+        background: rgba(255, 255, 255, 0.78);
+        box-shadow: 0 18px 42px rgba(31, 35, 40, 0.06);
+      }
+
+      .card h3 {
+        margin-bottom: 0.55rem;
+        color: var(--ink);
+        font-size: 1.06rem;
+      }
+
+      .card p,
+      .card li {
+        color: var(--muted);
+        line-height: 1.72;
+      }
+
+      .card ul {
+        margin: 0;
+        padding-left: 1.1rem;
+      }
+
+      .number {
+        display: inline-grid;
+        width: 2.15rem;
+        height: 2.15rem;
+        margin-bottom: 0.75rem;
+        place-items: center;
+        border-radius: 0.5rem;
+        color: #ffffff;
+        background: var(--ink);
+        font-weight: 900;
+      }
+
+      .band {
+        background: linear-gradient(180deg, #ffffff 0%, var(--paper) 100%);
+      }
+
+      .dark-band {
+        color: #ecfffa;
+        background: linear-gradient(135deg, #0f3d34 0%, #174f45 66%, #22302c 100%);
+      }
+
+      .dark-band h2,
+      .dark-band h3 {
+        color: #ffffff;
+      }
+
+      .dark-band .muted,
+      .dark-band p,
+      .dark-band li {
+        color: rgba(236, 255, 250, 0.78);
+      }
+
+      .dark-band .card {
+        border-color: rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: none;
+      }
+
+      .scenario {
+        display: grid;
+        grid-template-columns: minmax(0, 0.8fr) minmax(320px, 1fr);
+        gap: 2rem;
+        align-items: center;
+      }
+
+      .scenario img {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        box-shadow: var(--shadow);
+      }
+
+      .quote {
+        border-left: 0.32rem solid var(--risk);
+        padding: 0.25rem 0 0.25rem 1rem;
+        color: var(--ink);
+        font-size: clamp(1.25rem, 2vw, 1.7rem);
+        font-weight: 900;
+        line-height: 1.45;
+      }
+
+      .table {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        background: #ffffff;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 0.65fr 1fr 1fr;
+        gap: 1rem;
+        padding: 1rem;
+        border-top: 1px solid var(--line);
+      }
+
+      .row:first-child {
+        border-top: 0;
+        color: #ffffff;
+        background: var(--ink);
+        font-weight: 800;
+      }
+
+      .row span {
+        line-height: 1.65;
+      }
+
+      .visual-board {
+        border: 1px solid var(--line);
+        border-radius: 0.85rem;
+        padding: 1rem;
+        background: #ffffff;
+        box-shadow: var(--shadow);
+      }
+
+      .footer {
+        padding: 2.4rem clamp(1rem, 4vw, 3rem);
+        color: rgba(236, 255, 250, 0.75);
+        background: #0c2c26;
+      }
+
+      .footer .inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .fineprint {
+        color: rgba(31, 35, 40, 0.62);
+        font-size: 0.92rem;
+        line-height: 1.75;
+      }
+
+      @media (max-width: 980px) {
+        .hero-grid,
+        .section-heading,
+        .scenario {
+          grid-template-columns: 1fr;
+        }
+
+        .pain-grid,
+        .capability-grid,
+        .mode-grid,
+        .steps,
+        .proof-grid,
+        .metric-strip {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .nav {
+          display: none;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .section {
+          padding: 2.8rem 1rem;
+        }
+
+        .hero-grid {
+          min-height: auto;
+        }
+
+        .pain-grid,
+        .capability-grid,
+        .mode-grid,
+        .steps,
+        .proof-grid,
+        .metric-strip {
+          grid-template-columns: 1fr;
+        }
+
+        .row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="返回演示首页">
+        <span class="mark">PC</span>
+        <span>房地产成本 AI 平台手册</span>
+      </a>
+      <nav class="nav" aria-label="手册导航">
+        <a href="#pain">痛点</a>
+        <a href="#platform">平台</a>
+        <a href="#vibe">Vibe-Coding</a>
+        <a href="#scenarios">场景</a>
+        <a href="#pilot">试点</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section hero">
+        <div class="inner hero-grid">
+          <div>
+            <p class="eyebrow">脱敏公开演示版 · 产品手册</p>
+            <h1>房地产成本人工智能平台</h1>
+            <p class="lead">
+              面向物业、采购、成本、合同、材料与运营管理团队的 AI 辅助运营中枢。通过轻量化 Vibe-Coding 方式，把真实业务经验快速转化为可演示、可试点、可持续调整的系统能力。
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="https://lwxy000.github.io/property-cost-ai-platform-demo/" target="_blank" rel="noreferrer">打开在线演示</a>
+              <a class="button secondary" href="https://lwxy000.github.io/property-cost-ai-platform-demo/?tour=1" target="_blank" rel="noreferrer">观看自动导览</a>
+              <a class="button secondary" href="https://github.com/lwxy000/property-cost-ai-platform-demo" target="_blank" rel="noreferrer">查看 GitHub</a>
+            </div>
+          </div>
+          <aside class="hero-panel" aria-label="演示截图">
+            <img src="public/assets/cockpit-preview.png" alt="AI 运营决策中枢演示截图" />
+            <div class="metric-strip">
+              <div class="metric"><strong>86</strong><span>模拟项目组合</span></div>
+              <div class="metric"><strong>18k+</strong><span>材料价格样例</span></div>
+              <div class="metric"><strong>312</strong><span>合同台账样例</span></div>
+              <div class="metric"><strong>0</strong><span>生产数据接入</span></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="pain" class="section">
+        <div class="inner">
+          <div class="section-heading">
+            <div>
+              <p class="tagline">为什么需要它</p>
+              <h2>物业运营不是缺系统，而是缺一个能把业务线索串起来的决策中枢。</h2>
+            </div>
+            <p>
+              采购价格、材料台账、合同履约、区域成本、供应商表现和权限边界常常分散在不同表格与流程里。管理者真正需要的是从异常信号到证据链，再到执行动作的闭环。
+            </p>
+          </div>
+          <div class="pain-grid">
+            <article class="card">
+              <h3>价格沉淀弱</h3>
+              <p>材料价格、供应商报价、历史采购记录分散，难以形成可复用的成本基准。</p>
+            </article>
+            <article class="card">
+              <h3>合同风险滞后</h3>
+              <p>付款节点、续签期限、履约异常依赖人工跟踪，问题经常晚于业务发生。</p>
+            </article>
+            <article class="card">
+              <h3>区域差异难解释</h3>
+              <p>不同城市、项目、品类之间的成本波动缺少可视化对比和归因分析。</p>
+            </article>
+            <article class="card">
+              <h3>报表口径不统一</h3>
+              <p>管理层看结果，业务线看明细，执行层看任务，口径很难自然对齐。</p>
+            </article>
+            <article class="card">
+              <h3>系统建设偏重</h3>
+              <p>传统软件周期长、改动慢、试错成本高，不适合早期快速验证真实场景。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="platform" class="section band">
+        <div class="inner">
+          <div class="section-heading">
+            <div>
+              <p class="tagline">产品定位</p>
+              <h2>采购、成本、合同、材料和 AI 问答的一体化运营平台。</h2>
+            </div>
+            <p>
+              平台以经营驾驶舱为入口，用场景流程连接各模块：从成本压力发现，到材料价格核验、合同风险定位、AI 解释归因、权限脱敏分享，形成可执行的管理闭环。
+            </p>
+          </div>
+          <div class="capability-grid">
+            <article class="card">
+              <h3>经营驾驶舱</h3>
+              <p>聚焦管理层最关心的成本压力、风险事项、节降机会和待办证据链。</p>
+            </article>
+            <article class="card">
+              <h3>材料价格库</h3>
+              <p>沉淀材料价格、供应商报价、审核状态和 AI 识别候选项。</p>
+            </article>
+            <article class="card">
+              <h3>成本地图</h3>
+              <p>按区域、项目、品类展示成本压力、异常分布和节降机会。</p>
+            </article>
+            <article class="card">
+              <h3>合同管理</h3>
+              <p>跟踪付款进度、续签风险、履约节点和合同台账检索。</p>
+            </article>
+            <article class="card">
+              <h3>智能问答</h3>
+              <p>用自然语言查询业务数据、风险原因、项目差异和运营建议。</p>
+            </article>
+            <article class="card">
+              <h3>权限与脱敏</h3>
+              <p>支持不同角色视图、访客模式、数据范围和公开演示边界。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="vibe" class="section dark-band">
+        <div class="inner">
+          <div class="section-heading">
+            <div>
+              <p class="tagline">差异化方式</p>
+              <h2>Vibe-Coding 驱动的轻量化 AI 业务系统共创。</h2>
+            </div>
+            <p>
+              这不是传统“大而重”的软件建设路径，而是围绕一个真实业务痛点，快速搭建可演示、可试用、可调整的系统原型，再根据反馈持续迭代。
+            </p>
+          </div>
+          <div class="mode-grid">
+            <article class="card">
+              <span class="number">1</span>
+              <h3>轻量启动</h3>
+              <p>从材料价格库、合同预警或成本驾驶舱等单点切入，降低早期投入。</p>
+            </article>
+            <article class="card">
+              <span class="number">2</span>
+              <h3>快速成型</h3>
+              <p>业务想法可以快速转化为可点击、可演示、可验证的系统页面。</p>
+            </article>
+            <article class="card">
+              <span class="number">3</span>
+              <h3>随需调整</h3>
+              <p>字段、流程、权限、报表和页面聚焦点都能围绕客户反馈持续优化。</p>
+            </article>
+            <article class="card">
+              <span class="number">4</span>
+              <h3>成本可控</h3>
+              <p>先试点、再扩展，避免在需求未验证前投入完整系统建设成本。</p>
+            </article>
+            <article class="card">
+              <span class="number">5</span>
+              <h3>业务贴合</h3>
+              <p>以物业采购、成本、合同和材料管理的真实流程为核心，而不是套模板。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="scenarios" class="section">
+        <div class="inner scenario">
+          <div>
+            <p class="tagline">核心业务场景</p>
+            <h2>从一个异常信号，到一条可解释、可追踪、可执行的管理链路。</h2>
+            <p class="muted">
+              用户可以从经营驾驶舱进入业务场景，查看区域成本压力，追溯材料价格差异，联动合同风险，再通过智能问答生成解释口径。这个过程展示的是业务闭环，不只是模块堆叠。
+            </p>
+            <p class="quote">“让管理者先看到重点，再看到证据，最后看到动作。”</p>
+          </div>
+          <img src="public/assets/readme-scenarios.png" alt="业务场景演示截图" />
+        </div>
+      </section>
+
+      <section class="section band">
+        <div class="inner">
+          <div class="section-heading">
+            <div>
+              <p class="tagline">模块能力</p>
+              <h2>每个模块都服务于一个清晰的业务判断。</h2>
+            </div>
+            <p>手册对外展示时，不把模块平均铺开，而是强调每个模块在业务闭环里的角色和价值。</p>
+          </div>
+          <div class="table" role="table" aria-label="模块能力表">
+            <div class="row" role="row">
+              <span>模块</span>
+              <span>解决的问题</span>
+              <span>演示价值</span>
+            </div>
+            <div class="row" role="row">
+              <span>经营驾驶舱</span>
+              <span>高管需要快速识别组合风险和节降机会。</span>
+              <span>用聚焦式指标与风险栏呈现“今天最该看什么”。</span>
+            </div>
+            <div class="row" role="row">
+              <span>材料价格库</span>
+              <span>材料价格缺少沉淀、对比和审核流程。</span>
+              <span>展示 AI 导入候选、人工复核、价格异常和历史基准。</span>
+            </div>
+            <div class="row" role="row">
+              <span>成本地图</span>
+              <span>区域成本差异缺少可视化解释。</span>
+              <span>展示区域压力、异常项目、节降动作和风险雷达。</span>
+            </div>
+            <div class="row" role="row">
+              <span>合同管理</span>
+              <span>付款、续签、履约状态需要提前预警。</span>
+              <span>展示合同风险队列、付款进度、台账筛选和动作入口。</span>
+            </div>
+            <div class="row" role="row">
+              <span>智能问答</span>
+              <span>业务人员需要快速查询原因、口径和建议。</span>
+              <span>用自然语言把数据、场景和管理判断串起来。</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="inner visual-board">
+          <div class="section-heading">
+            <div>
+              <p class="tagline">IMAGE-2 视觉顾问</p>
+              <h2>手册设计基准：成熟、可信、轻量、有业务质感。</h2>
+            </div>
+            <p>
+              视觉方向采用深墨绿、米白、石墨灰和少量风险红，避免廉价科技感。版式强调高管汇报、产品成熟度和试点合作可信度。
+            </p>
+          </div>
+          <img src="public/assets/handbook-visual-direction.png" alt="IMAGE-2 生成的产品手册视觉方向板" />
+        </div>
+      </section>
+
+      <section id="pilot" class="section dark-band">
+        <div class="inner">
+          <div class="section-heading">
+            <div>
+              <p class="tagline">建议合作方式</p>
+              <h2>先交流痛点，再做轻量试点，最后决定是否扩展。</h2>
+            </div>
+            <p>
+              对外沟通时不急着报价，也不承诺“大而全”。建议用真实业务问题做入口，先验证价值，再讨论系统边界、数据范围、权限要求和实施方式。
+            </p>
+          </div>
+          <div class="steps">
+            <article class="card">
+              <span class="number">01</span>
+              <h3>需求访谈</h3>
+              <p>了解客户最痛的采购、成本、合同、材料或报表问题。</p>
+            </article>
+            <article class="card">
+              <span class="number">02</span>
+              <h3>样例演示</h3>
+              <p>基于脱敏样例或客户提供的非敏感口径，快速还原一个业务场景。</p>
+            </article>
+            <article class="card">
+              <span class="number">03</span>
+              <h3>轻量试点</h3>
+              <p>限定范围、限定角色、限定数据源，验证管理闭环是否成立。</p>
+            </article>
+            <article class="card">
+              <span class="number">04</span>
+              <h3>持续迭代</h3>
+              <p>根据真实反馈调整流程、页面、权限、报表和 AI 问答口径。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="inner">
+          <div class="section-heading">
+            <div>
+              <p class="tagline">公开演示边界</p>
+              <h2>当前版本只展示产品能力，不包含生产系统和真实业务数据。</h2>
+            </div>
+            <p>
+              公开仓库、在线演示、产品手册和视觉资料均为脱敏展示用途。任何客户试点都应重新确认数据边界、部署边界和权限边界。
+            </p>
+          </div>
+          <div class="proof-grid">
+            <article class="card">
+              <h3>独立展示仓库</h3>
+              <p>不是生产仓库公开，也不是生产仓库 fork，不带历史内部信息。</p>
+            </article>
+            <article class="card">
+              <h3>无后端依赖</h3>
+              <p>公开演示不连接 PostgreSQL、生产 API、对象存储或账号系统。</p>
+            </article>
+            <article class="card">
+              <h3>无真实文件</h3>
+              <p>不包含真实合同、上传文件、报价单、成本台账或内部材料。</p>
+            </article>
+            <article class="card">
+              <h3>全部样例数据</h3>
+              <p>组织、项目、供应商、价格、合同、问答和指标均为虚构样例。</p>
+            </article>
+          </div>
+          <p class="fineprint">
+            说明：本手册为 GitHub 展示版配套资料，用于介绍产品思路、业务场景和轻量化共创方式。它不代表任何真实客户系统、正式报价、生产部署或已上线商业服务。
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="inner">
+        <strong>房地产成本人工智能平台演示</strong>
+        <span>Vibe-Coding · 轻量化 · 快速试点 · 持续迭代</span>
+      </div>
+    </footer>
+  </body>
+</html>
